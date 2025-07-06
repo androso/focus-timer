@@ -60,8 +60,8 @@ export default function TodayStats() {
         </div>
         <div className="flex justify-between items-center">
           <span className="text-white/60 minimal-text">Total Time</span>
-          <span className="stat-number text-secondary flex items-center">
-            <Clock className="w-4 h-4 mr-2" />
+          <span className="stat-number text-white flex items-center">
+            <Clock className="w-4 h-4 mr-2 text-blue-400" />
             {formatTime(totalTime)}
           </span>
         </div>
