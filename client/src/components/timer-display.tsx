@@ -4,7 +4,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Square } from "lucide-react";
+import { Play, Pause, Square, BarChart3, Settings, User, LogOut } from "lucide-react";
+import { Link } from "wouter";
 import type { TimerSettings } from "@shared/schema";
 
 interface TimerState {
@@ -168,6 +169,36 @@ export default function TimerDisplay() {
         <h1 className="text-sm font-light tracking-[0.3em] text-white/70 uppercase">
           Work Time
         </h1>
+      </div>
+
+      {/* Right Navigation Panel */}
+      <div className="absolute right-8 top-1/2 transform -translate-y-1/2 flex flex-col space-y-6">
+        <Link href="/reports">
+          <Button 
+            className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+          >
+            <BarChart3 className="w-5 h-5 text-white" />
+          </Button>
+        </Link>
+        
+        <Button 
+          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+        >
+          <Settings className="w-5 h-5 text-white" />
+        </Button>
+        
+        <Button 
+          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+        >
+          <User className="w-5 h-5 text-white" />
+        </Button>
+        
+        <Button 
+          onClick={() => window.location.href = '/api/logout'}
+          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+        >
+          <LogOut className="w-5 h-5 text-white" />
+        </Button>
       </div>
 
       {/* Timer Display */}
