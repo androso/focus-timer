@@ -68,6 +68,9 @@ export type User = typeof users.$inferSelect;
 export const insertWorkSessionSchema = createInsertSchema(workSessions).omit({
   id: true,
   createdAt: true,
+}).extend({
+  startTime: z.string().or(z.date()).transform((val) => new Date(val)),
+  endTime: z.string().or(z.date()).transform((val) => new Date(val)),
 });
 
 export const insertTimerSettingsSchema = createInsertSchema(timerSettings).omit({

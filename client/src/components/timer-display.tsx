@@ -50,7 +50,13 @@ export default function TimerDisplay() {
       endTime: Date;
       completed: boolean;
     }) => {
-      await apiRequest('POST', '/api/work-sessions', sessionData);
+      // Convert dates to ISO strings for proper serialization
+      const payload = {
+        ...sessionData,
+        startTime: sessionData.startTime.toISOString(),
+        endTime: sessionData.endTime.toISOString(),
+      };
+      await apiRequest('POST', '/api/work-sessions', payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/work-sessions'] });
