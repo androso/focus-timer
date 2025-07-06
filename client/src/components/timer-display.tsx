@@ -231,7 +231,7 @@ export default function TimerDisplay() {
               onClick={pauseTimer}
               className="w-16 h-16 rounded-full bg-secondary hover:bg-secondary/80 text-secondary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
             >
-              <Pause className="w-6 h-6" />
+              {timerState.isPaused ? <Play className="w-6 h-6 ml-1" /> : <Pause className="w-6 h-6" />}
             </Button>
             <Button 
               onClick={stopTimer}
