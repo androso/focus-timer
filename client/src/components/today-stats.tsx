@@ -15,13 +15,9 @@ export default function TodayStats() {
   });
 
   const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
+    const totalMinutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${totalMinutes}m ${remainingSeconds}s`;
   };
 
   if (isLoading) {

@@ -249,7 +249,7 @@ export default function TimerDisplay() {
           Session {timerState.sessionCount}
         </div>
         <div className="text-xs text-muted-foreground/60">
-          Today's focused time: {Math.floor((todayStats?.totalTime || 0) / 60)} minutes
+          Today's focused time: {Math.floor((todayStats?.totalTime || 0) / 60)}m {(todayStats?.totalTime || 0) % 60}s
         </div>
       </div>
     </div>
