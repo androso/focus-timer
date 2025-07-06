@@ -5,6 +5,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import TodayStats from "@/components/today-stats";
+import RecentSessions from "@/components/recent-sessions";
+import WeeklyOverview from "@/components/weekly-overview";
 import ReportsSection from "@/components/reports-section";
 
 export default function Reports() {
@@ -78,6 +81,13 @@ export default function Reports() {
           <p className="text-muted-foreground">Detailed view of your productivity sessions and statistics</p>
         </div>
         
+        {/* Dashboard Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          <TodayStats />
+          <RecentSessions />
+          <WeeklyOverview />
+        </div>
+
         <ReportsSection />
       </main>
     </div>

@@ -6,9 +6,6 @@ import { Clock, BarChart3, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import TimerDisplay from "@/components/timer-display";
-import TodayStats from "@/components/today-stats";
-import RecentSessions from "@/components/recent-sessions";
-import WeeklyOverview from "@/components/weekly-overview";
 
 
 export default function Home() {
@@ -82,18 +79,9 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Timer Section */}
-        <section className="text-center mb-12">
+        <section className="text-center">
           <TimerDisplay />
         </section>
-
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <TodayStats />
-          <RecentSessions />
-          <WeeklyOverview />
-        </div>
-
-        
       </main>
     </div>
   );
