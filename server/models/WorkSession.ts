@@ -3,7 +3,7 @@ import {
   type WorkSession,
   type InsertWorkSession,
 } from "@shared/schema";
-import { db } from "../db";
+import { db } from "../config/database";
 import { eq, desc, gte, lte, and } from "drizzle-orm";
 
 export class WorkSessionModel {

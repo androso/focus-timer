@@ -96,10 +96,12 @@ The application is designed for deployment on Replit with the following configur
 ### File Structure
 - `/client`: Frontend React application
 - `/server`: Backend Express server following MVC pattern
-  - `/models`: Database models and business logic
-  - `/controllers`: Request handlers and API logic
+  - `/models`: Database models and business logic (User, WorkSession, TimerSettings)
+  - `/controllers`: Request handlers and API logic 
   - `/middleware`: Authentication and validation middleware
-  - `/routes`: Route configuration
+  - `/routes`: Modular route definitions organized by feature
+  - `/services`: Business services (auth, storage)
+  - `/config`: Configuration files (database connection)
 - `/shared`: Shared TypeScript schemas and types
 - `/migrations`: Database migration files
 
@@ -111,7 +113,13 @@ Changelog:
   - Created `/server/models/` directory with User, WorkSession, and TimerSettings models
   - Created `/server/controllers/` directory with corresponding controllers
   - Created `/server/middleware/` directory for authentication middleware
-  - Updated routes to use controllers instead of inline handlers
+  - Created `/server/routes/` directory with modular route definitions by feature
+  - Created `/server/services/` directory for business services (auth, storage)
+  - Created `/server/config/` directory for configuration files (database)
+  - Moved `db.ts` to `/server/config/database.ts`
+  - Moved `replitAuth.ts` to `/server/services/auth.ts`
+  - Moved `storage.ts` to `/server/services/storage.ts`
+  - Updated all import statements to reflect new file locations
   - Separated concerns for better code organization and maintainability
 
 ## User Preferences

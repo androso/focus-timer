@@ -9,7 +9,7 @@ import {
   type TimerSettings,
   type InsertTimerSettings,
 } from "@shared/schema";
-import { db } from "./db";
+import { db } from "../config/database";
 import { eq, desc, gte, lte, and, sql } from "drizzle-orm";
 
 // Interface for storage operations
