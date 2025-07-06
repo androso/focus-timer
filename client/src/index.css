@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(257, 47%, 17%);
-  --foreground: hsl(0, 0%, 95%);
-  --muted: hsl(257, 47%, 12%);
-  --muted-foreground: hsl(0, 0%, 65%);
-  --popover: hsl(257, 47%, 20%);
-  --popover-foreground: hsl(0, 0%, 95%);
-  --card: hsl(257, 47%, 15%);
-  --card-foreground: hsl(0, 0%, 95%);
-  --border: hsl(0, 0%, 100%, 0.1);
-  --input: hsl(0, 0%, 100%, 0.1);
+  --background: hsl(240, 10%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 4%, 16%);
+  --muted-foreground: hsl(240, 5%, 65%);
+  --popover: hsl(240, 10%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 8%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 4%, 16%);
+  --input: hsl(240, 4%, 16%);
   --primary: hsl(266, 85%, 58%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(224, 71%, 60%);
@@ -23,8 +23,25 @@
   --success-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(0, 0%, 100%, 0.2);
+  --ring: hsl(240, 5%, 84%);
   --radius: 1rem;
+  
+  /* Sidebar colors for dark theme */
+  --sidebar-background: hsl(240, 10%, 6%);
+  --sidebar-foreground: hsl(240, 5%, 65%);
+  --sidebar-primary: hsl(266, 85%, 58%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(240, 4%, 16%);
+  --sidebar-accent-foreground: hsl(240, 5%, 90%);
+  --sidebar-border: hsl(240, 4%, 16%);
+  --sidebar-ring: hsl(240, 5%, 84%);
+  
+  /* Chart colors for dark theme */
+  --chart-1: hsl(266, 85%, 58%);
+  --chart-2: hsl(224, 71%, 60%);
+  --chart-3: hsl(289, 84%, 72%);
+  --chart-4: hsl(142, 76%, 36%);
+  --chart-5: hsl(36, 100%, 50%);
 }
 
 /* Custom styles for minimalist aesthetic */
@@ -68,6 +85,7 @@
   background-clip: text;
 }
 
+/* Dark theme class for compatibility - now matches :root */
 .dark {
   --background: hsl(240, 10%, 4%);
   --foreground: hsl(0, 0%, 98%);
@@ -75,22 +93,22 @@
   --muted-foreground: hsl(240, 5%, 65%);
   --popover: hsl(240, 10%, 4%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 4%);
+  --card: hsl(240, 10%, 8%);
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(240, 4%, 16%);
   --input: hsl(240, 4%, 16%);
-  --primary: hsl(122, 39%, 49%);
+  --primary: hsl(266, 85%, 58%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(207, 90%, 54%);
+  --secondary: hsl(224, 71%, 60%);
   --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(36, 100%, 50%);
+  --accent: hsl(289, 84%, 72%);
   --accent-foreground: hsl(0, 0%, 100%);
-  --success: hsl(88, 50%, 53%);
+  --success: hsl(142, 76%, 36%);
   --success-foreground: hsl(0, 0%, 100%);
-  --destructive: hsl(0, 63%, 31%);
+  --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 5%, 84%);
-  --radius: 0.5rem;
+  --radius: 1rem;
 }
 
 @layer base {
