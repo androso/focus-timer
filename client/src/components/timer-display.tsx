@@ -35,6 +35,12 @@ export default function TimerDisplay() {
     retry: false,
   });
 
+  // Fetch today's stats for focused time
+  const { data: todayStats } = useQuery<{totalTime: number}>({
+    queryKey: ['/api/stats/today'],
+    retry: false,
+  });
+
   // Create work session mutation
   const createSessionMutation = useMutation({
     mutationFn: async (sessionData: {
@@ -250,7 +256,8 @@ export default function TimerDisplay() {
           <p>Session {timerState.sessionCount} • Focus Time</p>
           <p className="mt-1">
             {timerState.isRunning && !timerState.isPaused ? 'Running...' : 
-             timerState.isPaused ? 'Paused' : 'Ready to start'}
+             timerState.isPaused ? 'Paused' : 
+             `Today's focused time: ${Math.floor((todayStats?.totalTime || 0) / 60)} minutes`}
           </p>
         </div>
       </CardContent>
