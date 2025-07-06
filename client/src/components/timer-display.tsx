@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Square, BarChart3, Settings, User, LogOut } from "lucide-react";
+import { Play, Pause, Square, BarChart3, LogOut } from "lucide-react";
 import { Link } from "wouter";
 import type { TimerSettings } from "@shared/schema";
 
@@ -180,18 +180,6 @@ export default function TimerDisplay() {
             <BarChart3 className="w-5 h-5 text-secondary-foreground" />
           </Button>
         </Link>
-        
-        <Button 
-          className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
-        >
-          <Settings className="w-5 h-5 text-secondary-foreground" />
-        </Button>
-        
-        <Button 
-          className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
-        >
-          <User className="w-5 h-5 text-secondary-foreground" />
-        </Button>
         
         <Button 
           onClick={() => window.location.href = '/api/logout'}
