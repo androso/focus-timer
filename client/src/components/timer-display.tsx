@@ -4,7 +4,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Play, Pause, Square } from "lucide-react";
 import type { TimerSettings } from "@shared/schema";
 
@@ -20,11 +19,11 @@ export default function TimerDisplay() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  
+
   const [timerState, setTimerState] = useState<TimerState>({
     isRunning: false,
     isPaused: false,
-    timeElapsed: 0, // starts at 0 and counts up
+    timeElapsed: 0,
     sessionCount: 1,
     startTime: null,
   });
@@ -78,7 +77,7 @@ export default function TimerDisplay() {
     },
   });
 
-  // Update timer display - count up instead of down
+  // Update timer display
   useEffect(() => {
     if (timerState.isRunning && !timerState.isPaused) {
       intervalRef.current = setInterval(() => {
@@ -101,8 +100,6 @@ export default function TimerDisplay() {
     };
   }, [timerState.isRunning, timerState.isPaused]);
 
-  // No need to initialize from settings since we count up from 0
-
   const startTimer = () => {
     setTimerState(prev => ({
       ...prev,
@@ -124,14 +121,14 @@ export default function TimerDisplay() {
     if (timerState.startTime && timerState.timeElapsed > 0) {
       const endTime = new Date();
       const actualDuration = timerState.timeElapsed;
-      
+
       createSessionMutation.mutate({
         sessionType: 'work',
-        plannedDuration: actualDuration, // Use actual duration as planned since it's user-controlled
+        plannedDuration: actualDuration,
         actualDuration,
         startTime: timerState.startTime,
         endTime,
-        completed: true, // Consider it completed when user manually stops
+        completed: true,
       });
 
       toast({
@@ -153,114 +150,68 @@ export default function TimerDisplay() {
   };
 
   const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
+    const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    
-    if (hours > 0) {
-      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    }
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // For stopwatch mode, we'll show progress as a simple rotating circle
-  const getProgress = () => {
-    // Simple animation that rotates every 60 seconds
-    return (timerState.timeElapsed % 60) * (100 / 60);
-  };
-
-  const circumference = 2 * Math.PI * 45;
-  const strokeDashoffset = circumference - (getProgress() / 100) * circumference;
-
   return (
-    <Card className="max-w-md mx-auto stat-card">
-      <CardHeader>
-        <CardTitle className="text-2xl font-semibold text-center">
-          Work Session Timer
-        </CardTitle>
-        <p className="text-center text-muted-foreground">
-          Focus Session Stopwatch
-        </p>
-      </CardHeader>
-      <CardContent className="text-center">
-        {/* Timer Display */}
-        <div className="relative mb-8">
-          <div className="w-48 h-48 mx-auto relative">
-            <svg className="w-full h-full transform -rotate-90 timer-circle" viewBox="0 0 100 100">
-              {/* Background circle */}
-              <circle 
-                cx="50" 
-                cy="50" 
-                r="45" 
-                fill="none" 
-                stroke="hsl(var(--muted))" 
-                strokeWidth="8"
-              />
-              {/* Progress circle */}
-              <circle 
-                cx="50" 
-                cy="50" 
-                r="45" 
-                fill="none" 
-                stroke="hsl(var(--primary))" 
-                strokeWidth="8"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="transition-all duration-300 ease-in-out"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl font-bold text-foreground timer-display">
-                {formatTime(timerState.timeElapsed)}
-              </span>
-            </div>
-          </div>
-        </div>
+    <div className="fixed inset-0 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex flex-col items-center justify-center text-white overflow-hidden">
+      {/* Header */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
+        <h1 className="text-sm font-light tracking-[0.3em] text-white/70 uppercase">
+          Work Time
+        </h1>
+      </div>
 
-        {/* Timer Controls */}
-        <div className="flex justify-center space-x-4 mb-6">
+      {/* Timer Display */}
+      <div className="text-center mb-16">
+        <div className="text-8xl font-light mb-4 tracking-wide">
+          {formatTime(timerState.timeElapsed)}
+        </div>
+        <div className="text-sm font-light tracking-[0.25em] text-white/60 uppercase">
+          {timerState.isRunning && !timerState.isPaused ? 'Running' : 
+           timerState.isPaused ? 'Pause' : 
+           'Ready'}
+        </div>
+      </div>
+
+      {/* Control Buttons */}
+      <div className="flex items-center space-x-8">
+        {!timerState.isRunning ? (
           <Button 
             onClick={startTimer}
-            disabled={timerState.isRunning && !timerState.isPaused}
-            className={`bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-full font-medium transition-colors flex items-center ${
-              timerState.isRunning && !timerState.isPaused ? 'timer-active' : ''
-            }`}
+            className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
           >
-            <Play className="w-4 h-4 mr-2" />
-            Start
+            <Play className="w-6 h-6 text-white ml-1" />
           </Button>
-          
-          <Button 
-            onClick={pauseTimer}
-            disabled={!timerState.isRunning}
-            className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 rounded-full font-medium transition-colors flex items-center"
-          >
-            <Pause className="w-4 h-4 mr-2" />
-            {timerState.isPaused ? 'Resume' : 'Pause'}
-          </Button>
-          
-          <Button 
-            onClick={stopTimer}
-            disabled={!timerState.isRunning}
-            variant="secondary"
-            className="px-6 py-3 rounded-full font-medium transition-colors flex items-center"
-          >
-            <Square className="w-4 h-4 mr-2" />
-            Stop
-          </Button>
-        </div>
+        ) : (
+          <>
+            <Button 
+              onClick={pauseTimer}
+              className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+            >
+              <Pause className="w-6 h-6 text-white" />
+            </Button>
+            <Button 
+              onClick={stopTimer}
+              className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+            >
+              <Square className="w-6 h-6 text-white" />
+            </Button>
+          </>
+        )}
+      </div>
 
-        {/* Session Info */}
-        <div className="text-sm text-muted-foreground">
-          <p>Session {timerState.sessionCount} • Focus Time</p>
-          <p className="mt-1">
-            {timerState.isRunning && !timerState.isPaused ? 'Running...' : 
-             timerState.isPaused ? 'Paused' : 
-             `Today's focused time: ${Math.floor((todayStats?.totalTime || 0) / 60)} minutes`}
-          </p>
+      {/* Session Info */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center">
+        <div className="text-xs text-white/50 mb-2">
+          Session {timerState.sessionCount}
         </div>
-      </CardContent>
-    </Card>
+        <div className="text-xs text-white/40">
+          Today's focused time: {Math.floor((todayStats?.totalTime || 0) / 60)} minutes
+        </div>
+      </div>
+    </div>
   );
 }
