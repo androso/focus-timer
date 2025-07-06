@@ -107,6 +107,21 @@ export default function TimerDisplay() {
     };
   }, [timerState.isRunning, timerState.isPaused]);
 
+  // Update document title with timer
+  useEffect(() => {
+    if (timerState.isRunning) {
+      const status = timerState.isPaused ? 'Paused' : 'Running';
+      document.title = `${formatTime(timerState.timeElapsed)} - ${status} | Focus Timer`;
+    } else {
+      document.title = 'Focus Timer';
+    }
+
+    // Cleanup: Reset title when component unmounts
+    return () => {
+      document.title = 'Focus Timer';
+    };
+  }, [timerState.timeElapsed, timerState.isRunning, timerState.isPaused]);
+
   const startTimer = () => {
     setTimerState(prev => ({
       ...prev,
