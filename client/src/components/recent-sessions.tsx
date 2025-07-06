@@ -25,83 +25,75 @@ export default function RecentSessions() {
 
   if (isLoading) {
     return (
-      <Card className="stat-card">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-foreground flex items-center">
-            <History className="w-5 h-5 text-secondary mr-2" />
-            Recent Sessions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg animate-pulse">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 bg-muted-foreground rounded-full mr-3"></div>
-                  <div>
-                    <div className="w-24 h-4 bg-muted-foreground rounded mb-1"></div>
-                    <div className="w-16 h-3 bg-muted-foreground rounded"></div>
-                  </div>
+      <div className="glass-card p-8">
+        <div className="flex items-center mb-6">
+          <History className="w-5 h-5 text-secondary mr-3" />
+          <h3 className="text-lg minimal-heading text-white/90">Recent Sessions</h3>
+        </div>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-lg animate-pulse">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-white/20 rounded-full mr-3"></div>
+                <div>
+                  <div className="w-24 h-4 bg-white/20 rounded mb-1"></div>
+                  <div className="w-16 h-3 bg-white/20 rounded"></div>
                 </div>
-                <div className="w-12 h-4 bg-muted-foreground rounded"></div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <div className="w-12 h-4 bg-white/20 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   }
 
   const recentSessions = sessions?.slice(0, 5) || [];
 
   return (
-    <Card className="stat-card">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-foreground flex items-center">
-          <History className="w-5 h-5 text-secondary mr-2" />
-          Recent Sessions
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3 max-h-80 overflow-y-auto custom-scrollbar">
-          {recentSessions.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <History className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>No sessions yet</p>
-              <p className="text-sm">Start your first timer session!</p>
-            </div>
-          ) : (
-            recentSessions.map((session) => (
-              <div key={session.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-                <div className="flex items-center">
-                  <div className="w-3 h-3 rounded-full mr-3 session-work"></div>
-                  <div>
-                    <div className="flex items-center">
-                      <Play className="w-3 h-3 mr-1 text-primary" />
-                      <p className="font-medium text-foreground">
-                        Work Session
-                      </p>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {formatTime(session.actualDuration)}
+    <div className="glass-card p-8">
+      <div className="flex items-center mb-6">
+        <History className="w-5 h-5 text-secondary mr-3" />
+        <h3 className="text-lg minimal-heading text-white/90">Recent Sessions</h3>
+      </div>
+      <div className="space-y-4 max-h-80 overflow-y-auto">
+        {recentSessions.length === 0 ? (
+          <div className="text-center py-8 text-white/60">
+            <History className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p className="minimal-text">No sessions yet</p>
+            <p className="text-sm minimal-text">Start your first timer session!</p>
+          </div>
+        ) : (
+          recentSessions.map((session) => (
+            <div key={session.id} className="flex items-center justify-between p-4 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full mr-3 bg-primary"></div>
+                <div>
+                  <div className="flex items-center">
+                    <Play className="w-3 h-3 mr-1 text-primary" />
+                    <p className="minimal-text text-white/90">
+                      Work Session
                     </p>
                   </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-sm text-muted-foreground">
-                    {formatSessionTime(session.startTime)}
-                  </span>
-                  <div className="mt-1">
-                    <Badge variant={session.completed ? "default" : "secondary"} className="text-xs">
-                      {session.completed ? "Completed" : "Interrupted"}
-                    </Badge>
-                  </div>
+                  <p className="text-sm text-white/60 minimal-text">
+                    {formatTime(session.actualDuration)}
+                  </p>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      </CardContent>
-    </Card>
+              <div className="text-right">
+                <span className="text-sm text-white/60 minimal-text">
+                  {formatSessionTime(session.startTime)}
+                </span>
+                <div className="mt-1">
+                  <Badge variant={session.completed ? "default" : "secondary"} className="text-xs glass-effect">
+                    {session.completed ? "Completed" : "Interrupted"}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 }

@@ -45,27 +45,27 @@ export default function Reports() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen gradient-bg">
       {/* Navigation */}
-      <nav className="bg-card shadow-sm border-b border-border">
+      <nav className="glass-effect fixed top-0 w-full z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Clock className="text-primary text-2xl mr-3" />
-              <span className="text-xl font-semibold text-foreground">Focus Timer</span>
+              <Clock className="text-white/90 text-2xl mr-3" />
+              <span className="text-xl minimal-text text-white/90">Focus Timer</span>
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/">
-                <Button variant="ghost" size="sm" className="text-foreground hover:text-primary">
+                <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 transition-all">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Dashboard
+                  Back
                 </Button>
               </Link>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => window.location.href = '/api/logout'}
-                className="text-foreground hover:text-primary"
+                className="text-white/70 hover:text-white hover:bg-white/10 transition-all"
               >
                 <Clock className="w-4 h-4" />
               </Button>
@@ -75,10 +75,10 @@ export default function Reports() {
       </nav>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Reports & Analytics</h1>
-          <p className="text-muted-foreground">Detailed view of your productivity sessions and statistics</p>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl minimal-heading text-white mb-4">Reports & Analytics</h1>
+          <p className="text-white/60 minimal-text">Detailed view of your productivity sessions and statistics</p>
         </div>
         
         {/* Dashboard Grid */}

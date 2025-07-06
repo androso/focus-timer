@@ -26,24 +26,20 @@ export default function TodayStats() {
 
   if (isLoading) {
     return (
-      <Card className="stat-card">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-foreground flex items-center">
-            <CalendarDays className="w-5 h-5 text-primary mr-2" />
-            Today's Progress
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex justify-between items-center">
-                <div className="w-24 h-4 bg-muted rounded animate-pulse"></div>
-                <div className="w-16 h-8 bg-muted rounded animate-pulse"></div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      <div className="glass-card p-8">
+        <div className="flex items-center mb-6">
+          <CalendarDays className="w-5 h-5 text-primary mr-3" />
+          <h3 className="text-lg minimal-heading text-white/90">Today's Progress</h3>
+        </div>
+        <div className="space-y-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="flex justify-between items-center">
+              <div className="w-24 h-4 bg-white/10 rounded animate-pulse"></div>
+              <div className="w-16 h-8 bg-white/10 rounded animate-pulse"></div>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   }
 
@@ -52,35 +48,31 @@ export default function TodayStats() {
   const efficiency = stats?.efficiency || 0;
 
   return (
-    <Card className="stat-card">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-foreground flex items-center">
-          <CalendarDays className="w-5 h-5 text-primary mr-2" />
-          Today's Progress
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Completed Sessions</span>
-            <span className="text-2xl font-bold text-primary">{completedSessions}</span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Total Time</span>
-            <span className="text-2xl font-bold text-secondary flex items-center">
-              <Clock className="w-4 h-4 mr-1" />
-              {formatTime(totalTime)}
-            </span>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-muted-foreground">Efficiency</span>
-            <span className="text-2xl font-bold text-success flex items-center">
-              <TrendingUp className="w-4 h-4 mr-1" />
-              {efficiency}%
-            </span>
-          </div>
+    <div className="glass-card p-8">
+      <div className="flex items-center mb-6">
+        <CalendarDays className="w-5 h-5 text-primary mr-3" />
+        <h3 className="text-lg minimal-heading text-white/90">Today's Progress</h3>
+      </div>
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <span className="text-white/60 minimal-text">Completed Sessions</span>
+          <span className="stat-number text-primary">{completedSessions}</span>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex justify-between items-center">
+          <span className="text-white/60 minimal-text">Total Time</span>
+          <span className="stat-number text-secondary flex items-center">
+            <Clock className="w-4 h-4 mr-2" />
+            {formatTime(totalTime)}
+          </span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-white/60 minimal-text">Efficiency</span>
+          <span className="stat-number text-success flex items-center">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            {efficiency}%
+          </span>
+        </div>
+      </div>
+    </div>
   );
 }

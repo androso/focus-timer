@@ -43,43 +43,11 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="bg-card shadow-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Clock className="text-primary text-2xl mr-3" />
-              <span className="text-xl font-semibold text-foreground">Focus Timer</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/reports">
-                <Button variant="ghost" size="sm" className="text-foreground hover:text-primary">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Reports
-                </Button>
-              </Link>
-              <Button variant="ghost" size="sm" className="text-foreground hover:text-primary">
-                <User className="w-4 h-4 mr-2" />
-                {user?.firstName || user?.email || 'Profile'}
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => window.location.href = '/api/logout'}
-                className="text-foreground hover:text-primary"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
+    <div className="min-h-screen gradient-bg">
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main>
         {/* Timer Section */}
-        <section className="text-center">
+        <section>
           <TimerDisplay />
         </section>
       </main>
