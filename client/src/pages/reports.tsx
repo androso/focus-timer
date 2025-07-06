@@ -56,8 +56,8 @@ export default function Reports() {
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/">
-                <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 transition-all">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                <Button variant="ghost" size="sm" className="text-white/70 hover:text-white hover:bg-white/10 hover:scale-105 transition-all duration-200 group">
+                  <ArrowLeft className="w-4 h-4 mr-2 transition-transform duration-200 group-hover:translate-x-[-2px]" />
                   Back
                 </Button>
               </Link>
@@ -65,9 +65,9 @@ export default function Reports() {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => window.location.href = '/api/logout'}
-                className="text-white/70 hover:text-white hover:bg-white/10 transition-all"
+                className="text-white/70 hover:text-white hover:bg-white/10 hover:scale-105 transition-all duration-200 group"
               >
-                <Clock className="w-4 h-4" />
+                <Clock className="w-4 h-4 transition-transform duration-200 group-hover:rotate-12" />
               </Button>
             </div>
           </div>

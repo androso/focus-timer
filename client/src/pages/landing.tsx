@@ -33,7 +33,7 @@ export default function Landing() {
           <Button 
             size="lg" 
             onClick={() => window.location.href = '/api/login'}
-            className="glass-effect hover:bg-white/20 text-white border-white/20 px-8 py-4 text-lg minimal-text"
+            className="glass-effect hover:bg-white/20 hover:scale-105 hover:shadow-xl hover:shadow-white/10 text-white border-white/20 px-8 py-4 text-lg minimal-text transition-all duration-300"
           >
             Get Started Free
           </Button>
@@ -85,7 +85,7 @@ export default function Landing() {
           <Button 
             size="lg"
             onClick={() => window.location.href = '/api/login'}
-            className="glass-effect hover:bg-white/20 text-white border-white/20 px-8 py-4 minimal-text"
+            className="glass-effect hover:bg-white/20 hover:scale-105 hover:shadow-xl hover:shadow-white/10 text-white border-white/20 px-8 py-4 minimal-text transition-all duration-300"
           >
             Start Your First Session
           </Button>

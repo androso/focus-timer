@@ -190,17 +190,17 @@ export default function TimerDisplay() {
       <div className="absolute right-8 top-1/2 transform -translate-y-1/2 flex flex-col space-y-6">
         <Link href="/reports">
           <Button 
-            className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+            className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 hover:scale-110 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-secondary/25 group"
           >
-            <BarChart3 className="w-5 h-5 text-secondary-foreground" />
+            <BarChart3 className="w-5 h-5 text-secondary-foreground transition-transform duration-200 group-hover:scale-110" />
           </Button>
         </Link>
         
         <Button 
           onClick={() => window.location.href = '/api/logout'}
-          className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+          className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 hover:scale-110 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-secondary/25 group"
         >
-          <LogOut className="w-5 h-5 text-secondary-foreground" />
+          <LogOut className="w-5 h-5 text-secondary-foreground transition-transform duration-200 group-hover:scale-110" />
         </Button>
       </div>
 
@@ -221,23 +221,23 @@ export default function TimerDisplay() {
         {!timerState.isRunning ? (
           <Button 
             onClick={startTimer}
-            className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+            className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 hover:scale-105 text-primary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-primary/25"
           >
-            <Play className="w-6 h-6 ml-1" />
+            <Play className="w-6 h-6 ml-1 transition-transform duration-200 group-hover:scale-110" />
           </Button>
         ) : (
           <>
             <Button 
               onClick={pauseTimer}
-              className="w-16 h-16 rounded-full bg-secondary hover:bg-secondary/80 text-secondary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+              className="w-16 h-16 rounded-full bg-secondary hover:bg-secondary/80 hover:scale-105 text-secondary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-secondary/25 group"
             >
-              {timerState.isPaused ? <Play className="w-6 h-6 ml-1" /> : <Pause className="w-6 h-6" />}
+              {timerState.isPaused ? <Play className="w-6 h-6 ml-1 transition-transform duration-200 group-hover:scale-110" /> : <Pause className="w-6 h-6 transition-transform duration-200 group-hover:scale-110" />}
             </Button>
             <Button 
               onClick={stopTimer}
-              className="w-16 h-16 rounded-full bg-destructive hover:bg-destructive/80 text-destructive-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+              className="w-16 h-16 rounded-full bg-destructive hover:bg-destructive/80 hover:scale-105 text-destructive-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-destructive/25 group"
             >
-              <Square className="w-6 h-6" />
+              <Square className="w-6 h-6 transition-transform duration-200 group-hover:scale-110" />
             </Button>
           </>
         )}
