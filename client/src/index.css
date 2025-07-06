@@ -3,45 +3,45 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(240, 10%, 4%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 4%, 16%);
-  --muted-foreground: hsl(240, 5%, 65%);
-  --popover: hsl(240, 10%, 4%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 8%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 4%, 16%);
-  --input: hsl(240, 4%, 16%);
-  --primary: hsl(266, 85%, 58%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(224, 71%, 60%);
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(289, 84%, 72%);
-  --accent-foreground: hsl(0, 0%, 100%);
-  --success: hsl(142, 76%, 36%);
-  --success-foreground: hsl(0, 0%, 100%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 5%, 84%);
-  --radius: 1rem;
+  --background: hsl(222, 84%, 5%);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --popover: hsl(222, 84%, 5%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(222, 84%, 5%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217, 32%, 17%);
+  --input: hsl(217, 32%, 17%);
+  --primary: hsl(210, 40%, 98%);
+  --primary-foreground: hsl(222, 84%, 5%);
+  --secondary: hsl(217, 32%, 17%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(217, 32%, 17%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --success: hsl(119, 34%, 47%);
+  --success-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 62%, 30%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(217, 32%, 17%);
+  --radius: 0.5rem;
   
   /* Sidebar colors for dark theme */
-  --sidebar-background: hsl(240, 10%, 6%);
-  --sidebar-foreground: hsl(240, 5%, 65%);
-  --sidebar-primary: hsl(266, 85%, 58%);
-  --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(240, 4%, 16%);
-  --sidebar-accent-foreground: hsl(240, 5%, 90%);
-  --sidebar-border: hsl(240, 4%, 16%);
-  --sidebar-ring: hsl(240, 5%, 84%);
+  --sidebar-background: hsl(222, 84%, 4%);
+  --sidebar-foreground: hsl(215, 20%, 65%);
+  --sidebar-primary: hsl(210, 40%, 98%);
+  --sidebar-primary-foreground: hsl(222, 84%, 5%);
+  --sidebar-accent: hsl(217, 32%, 17%);
+  --sidebar-accent-foreground: hsl(210, 40%, 98%);
+  --sidebar-border: hsl(217, 32%, 17%);
+  --sidebar-ring: hsl(217, 32%, 17%);
   
   /* Chart colors for dark theme */
-  --chart-1: hsl(266, 85%, 58%);
-  --chart-2: hsl(224, 71%, 60%);
-  --chart-3: hsl(289, 84%, 72%);
-  --chart-4: hsl(142, 76%, 36%);
-  --chart-5: hsl(36, 100%, 50%);
+  --chart-1: hsl(220, 70%, 50%);
+  --chart-2: hsl(160, 60%, 45%);
+  --chart-3: hsl(30, 80%, 55%);
+  --chart-4: hsl(280, 65%, 60%);
+  --chart-5: hsl(340, 75%, 55%);
 }
 
 /* Custom styles for minimalist aesthetic */
@@ -75,40 +75,37 @@
 }
 
 .gradient-bg {
-  background: linear-gradient(135deg, hsl(266, 85%, 58%) 0%, hsl(224, 71%, 60%) 50%, hsl(289, 84%, 72%) 100%);
+  background: hsl(var(--background));
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, hsl(266, 85%, 58%) 0%, hsl(224, 71%, 60%) 50%, hsl(289, 84%, 72%) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: hsl(var(--foreground));
 }
 
 /* Dark theme class for compatibility - now matches :root */
 .dark {
-  --background: hsl(240, 10%, 4%);
-  --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 4%, 16%);
-  --muted-foreground: hsl(240, 5%, 65%);
-  --popover: hsl(240, 10%, 4%);
-  --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 8%);
-  --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 4%, 16%);
-  --input: hsl(240, 4%, 16%);
-  --primary: hsl(266, 85%, 58%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(224, 71%, 60%);
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(289, 84%, 72%);
-  --accent-foreground: hsl(0, 0%, 100%);
-  --success: hsl(142, 76%, 36%);
-  --success-foreground: hsl(0, 0%, 100%);
-  --destructive: hsl(0, 84%, 60%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 5%, 84%);
-  --radius: 1rem;
+  --background: hsl(222, 84%, 5%);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(217, 32%, 17%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --popover: hsl(222, 84%, 5%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(222, 84%, 5%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217, 32%, 17%);
+  --input: hsl(217, 32%, 17%);
+  --primary: hsl(210, 40%, 98%);
+  --primary-foreground: hsl(222, 84%, 5%);
+  --secondary: hsl(217, 32%, 17%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(217, 32%, 17%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --success: hsl(119, 34%, 47%);
+  --success-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 62%, 30%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(217, 32%, 17%);
+  --radius: 0.5rem;
 }
 
 @layer base {
@@ -134,10 +131,10 @@
 /* Custom button animations */
 @keyframes pulse-primary {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+    box-shadow: 0 0 0 0 hsl(var(--ring) / 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(76, 175, 80, 0);
+    box-shadow: 0 0 0 8px hsl(var(--ring) / 0);
   }
 }
 
@@ -147,7 +144,7 @@
 
 /* Progress bar styles */
 .progress-bar {
-  background: linear-gradient(90deg, var(--primary) 0%, var(--success) 100%);
+  background: hsl(var(--foreground));
   border-radius: 9999px;
   height: 8px;
   transition: width 0.3s ease;
@@ -174,13 +171,8 @@
 
 /* Statistics cards */
 .stat-card {
-  background: linear-gradient(135deg, white 0%, hsl(var(--muted)) 100%);
+  background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
-  backdrop-filter: blur(10px);
-}
-
-.dark .stat-card {
-  background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
 }
 
 /* Session type indicators */
@@ -194,6 +186,31 @@
 
 .session-long-break {
   background: hsl(var(--secondary));
+}
+
+/* Glass effect for dark mode */
+.glass-effect {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+}
+
+/* Minimal text styles */
+.minimal-text {
+  font-weight: 300;
+  letter-spacing: 0.025em;
+}
+
+.minimal-heading {
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 /* Mobile responsive adjustments */
