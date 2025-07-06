@@ -12,7 +12,6 @@ interface TimerState {
   isRunning: boolean;
   isPaused: boolean;
   timeElapsed: number;
-  sessionType: 'work' | 'break';
   sessionCount: number;
   startTime: Date | null;
 }
@@ -26,7 +25,6 @@ export default function TimerDisplay() {
     isRunning: false,
     isPaused: false,
     timeElapsed: 0, // starts at 0 and counts up
-    sessionType: 'work',
     sessionCount: 1,
     startTime: null,
   });
@@ -99,12 +97,6 @@ export default function TimerDisplay() {
 
   // No need to initialize from settings since we count up from 0
 
-  const getSessionDuration = (type: 'work' | 'break') => {
-    const workDuration = settings?.workDuration || 25;
-    const breakDuration = settings?.shortBreakDuration || 5;
-    return type === 'work' ? workDuration * 60 : breakDuration * 60;
-  };
-
   const startTimer = () => {
     setTimerState(prev => ({
       ...prev,
@@ -128,7 +120,7 @@ export default function TimerDisplay() {
       const actualDuration = timerState.timeElapsed;
       
       createSessionMutation.mutate({
-        sessionType: timerState.sessionType,
+        sessionType: 'work',
         plannedDuration: actualDuration, // Use actual duration as planned since it's user-controlled
         actualDuration,
         startTime: timerState.startTime,
@@ -137,8 +129,8 @@ export default function TimerDisplay() {
       });
 
       toast({
-        title: "Session Saved!",
-        description: `${timerState.sessionType === 'work' ? 'Work' : 'Break'} session saved (${formatTime(actualDuration)})`,
+        title: "Work Session Saved!",
+        description: `Session saved (${formatTime(actualDuration)})`,
         variant: "default",
       });
     }
@@ -150,7 +142,7 @@ export default function TimerDisplay() {
       isPaused: false,
       timeElapsed: 0,
       startTime: null,
-      sessionCount: prev.sessionType === 'work' && timerState.timeElapsed > 0 ? prev.sessionCount + 1 : prev.sessionCount,
+      sessionCount: timerState.timeElapsed > 0 ? prev.sessionCount + 1 : prev.sessionCount,
     }));
   };
 
@@ -178,10 +170,10 @@ export default function TimerDisplay() {
     <Card className="max-w-md mx-auto stat-card">
       <CardHeader>
         <CardTitle className="text-2xl font-semibold text-center">
-          Stopwatch Timer
+          Work Session Timer
         </CardTitle>
         <p className="text-center text-muted-foreground">
-          {timerState.sessionType === 'work' ? 'Focus Session' : 'Break Session'}
+          Focus Session Stopwatch
         </p>
       </CardHeader>
       <CardContent className="text-center">
@@ -204,7 +196,7 @@ export default function TimerDisplay() {
                 cy="50" 
                 r="45" 
                 fill="none" 
-                stroke={timerState.sessionType === 'work' ? "hsl(var(--primary))" : "hsl(var(--accent))"} 
+                stroke="hsl(var(--primary))" 
                 strokeWidth="8"
                 strokeDasharray={circumference}
                 strokeDashoffset={strokeDashoffset}
@@ -253,35 +245,9 @@ export default function TimerDisplay() {
           </Button>
         </div>
 
-        {/* Session Type Toggle */}
-        <div className="mb-4 flex justify-center space-x-2">
-          <button
-            onClick={() => setTimerState(prev => ({ ...prev, sessionType: 'work' }))}
-            disabled={timerState.isRunning}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              timerState.sessionType === 'work'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
-          >
-            Work Session
-          </button>
-          <button
-            onClick={() => setTimerState(prev => ({ ...prev, sessionType: 'break' }))}
-            disabled={timerState.isRunning}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              timerState.sessionType === 'break'
-                ? 'bg-accent text-accent-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
-          >
-            Break Session
-          </button>
-        </div>
-
         {/* Session Info */}
         <div className="text-sm text-muted-foreground">
-          <p>Session {timerState.sessionCount} • {timerState.sessionType === 'work' ? 'Focus Time' : 'Break Time'}</p>
+          <p>Session {timerState.sessionCount} • Focus Time</p>
           <p className="mt-1">
             {timerState.isRunning && !timerState.isPaused ? 'Running...' : 
              timerState.isPaused ? 'Paused' : 'Ready to start'}

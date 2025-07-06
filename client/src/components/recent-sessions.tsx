@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { History, Play, Coffee } from "lucide-react";
+import { History, Play } from "lucide-react";
 import type { WorkSession } from "@shared/schema";
 
 export default function RecentSessions() {
@@ -74,18 +74,12 @@ export default function RecentSessions() {
             recentSessions.map((session) => (
               <div key={session.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
                 <div className="flex items-center">
-                  <div className={`w-3 h-3 rounded-full mr-3 ${
-                    session.sessionType === 'work' ? 'session-work' : 'session-break'
-                  }`}></div>
+                  <div className="w-3 h-3 rounded-full mr-3 session-work"></div>
                   <div>
                     <div className="flex items-center">
-                      {session.sessionType === 'work' ? (
-                        <Play className="w-3 h-3 mr-1 text-primary" />
-                      ) : (
-                        <Coffee className="w-3 h-3 mr-1 text-accent" />
-                      )}
-                      <p className="font-medium text-foreground capitalize">
-                        {session.sessionType} Session
+                      <Play className="w-3 h-3 mr-1 text-primary" />
+                      <p className="font-medium text-foreground">
+                        Work Session
                       </p>
                     </div>
                     <p className="text-sm text-muted-foreground">

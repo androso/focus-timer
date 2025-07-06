@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Play, Coffee, Check, X } from "lucide-react";
+import { Calendar, Play, Check, X } from "lucide-react";
 import type { WorkSession } from "@shared/schema";
 
 export default function ReportsSection() {
@@ -35,12 +35,8 @@ export default function ReportsSection() {
     });
   };
 
-  const getSessionTypeIcon = (type: string) => {
-    return type === 'work' ? (
-      <Play className="w-4 h-4 mr-1 text-primary" />
-    ) : (
-      <Coffee className="w-4 h-4 mr-1 text-accent" />
-    );
+  const getSessionTypeIcon = () => {
+    return <Play className="w-4 h-4 mr-1 text-primary" />;
   };
 
   const getStatusBadge = (completed: boolean) => {
@@ -137,9 +133,9 @@ export default function ReportsSection() {
                           {formatSessionTime(session.startTime)}
                         </div>
                         <div className="flex items-center">
-                          {getSessionTypeIcon(session.sessionType)}
-                          <span className="capitalize text-foreground font-medium">
-                            {session.sessionType}
+                          {getSessionTypeIcon()}
+                          <span className="text-foreground font-medium">
+                            Work
                           </span>
                         </div>
                         <div className="text-foreground">
