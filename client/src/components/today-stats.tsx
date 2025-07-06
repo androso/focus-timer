@@ -17,7 +17,7 @@ export default function TodayStats() {
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }
@@ -29,7 +29,7 @@ export default function TodayStats() {
       <div className="glass-card p-8">
         <div className="flex items-center mb-6">
           <CalendarDays className="w-5 h-5 text-primary mr-3" />
-          <h3 className="text-lg minimal-heading text-white/90">Today's Progress</h3>
+          <h3 className="text-lg minimal-heading text-white/95">Today's Progress</h3>
         </div>
         <div className="space-y-6">
           {[...Array(3)].map((_, i) => (
@@ -51,7 +51,7 @@ export default function TodayStats() {
     <div className="glass-card p-8">
       <div className="flex items-center mb-6">
         <CalendarDays className="w-5 h-5 text-primary mr-3" />
-        <h3 className="text-lg minimal-heading text-white/90">Today's Progress</h3>
+        <h3 className="text-lg minimal-heading text-white/95">Today's Progress</h3>
       </div>
       <div className="space-y-6">
         <div className="flex justify-between items-center">

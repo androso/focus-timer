@@ -78,7 +78,7 @@ export default function Reports() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-24">
         <div className="mb-12 text-center">
           <h1 className="text-4xl minimal-heading text-white mb-4">Reports & Analytics</h1>
-          <p className="text-white/60 minimal-text">Detailed view of your productivity sessions and statistics</p>
+          <p className="text-white/80 minimal-text">Detailed view of your productivity sessions and statistics</p>
         </div>
         
         {/* Dashboard Grid */}
