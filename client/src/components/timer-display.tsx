@@ -163,10 +163,10 @@ export default function TimerDisplay() {
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex flex-col items-center justify-center text-white overflow-hidden">
+    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center text-foreground overflow-hidden">
       {/* Header */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2">
-        <h1 className="text-sm font-light tracking-[0.3em] text-white/70 uppercase">
+        <h1 className="text-sm font-light tracking-[0.3em] text-muted-foreground uppercase">
           Work Time
         </h1>
       </div>
@@ -175,29 +175,29 @@ export default function TimerDisplay() {
       <div className="absolute right-8 top-1/2 transform -translate-y-1/2 flex flex-col space-y-6">
         <Link href="/reports">
           <Button 
-            className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+            className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
           >
-            <BarChart3 className="w-5 h-5 text-white" />
+            <BarChart3 className="w-5 h-5 text-secondary-foreground" />
           </Button>
         </Link>
         
         <Button 
-          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+          className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
         >
-          <Settings className="w-5 h-5 text-white" />
+          <Settings className="w-5 h-5 text-secondary-foreground" />
         </Button>
         
         <Button 
-          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+          className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
         >
-          <User className="w-5 h-5 text-white" />
+          <User className="w-5 h-5 text-secondary-foreground" />
         </Button>
         
         <Button 
           onClick={() => window.location.href = '/api/logout'}
-          className="w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+          className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
         >
-          <LogOut className="w-5 h-5 text-white" />
+          <LogOut className="w-5 h-5 text-secondary-foreground" />
         </Button>
       </div>
 
@@ -206,7 +206,7 @@ export default function TimerDisplay() {
         <div className="text-8xl font-light mb-4 tracking-wide">
           {formatTime(timerState.timeElapsed)}
         </div>
-        <div className="text-sm font-light tracking-[0.25em] text-white/60 uppercase">
+        <div className="text-sm font-light tracking-[0.25em] text-muted-foreground uppercase">
           {timerState.isRunning && !timerState.isPaused ? 'Running' : 
            timerState.isPaused ? 'Pause' : 
            'Ready'}
@@ -218,23 +218,23 @@ export default function TimerDisplay() {
         {!timerState.isRunning ? (
           <Button 
             onClick={startTimer}
-            className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+            className="w-16 h-16 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
           >
-            <Play className="w-6 h-6 text-white ml-1" />
+            <Play className="w-6 h-6 ml-1" />
           </Button>
         ) : (
           <>
             <Button 
               onClick={pauseTimer}
-              className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+              className="w-16 h-16 rounded-full bg-secondary hover:bg-secondary/80 text-secondary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
             >
-              <Pause className="w-6 h-6 text-white" />
+              <Pause className="w-6 h-6" />
             </Button>
             <Button 
               onClick={stopTimer}
-              className="w-16 h-16 rounded-full bg-white/20 hover:bg-white/30 border border-white/30 backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
+              className="w-16 h-16 rounded-full bg-destructive hover:bg-destructive/80 text-destructive-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
             >
-              <Square className="w-6 h-6 text-white" />
+              <Square className="w-6 h-6" />
             </Button>
           </>
         )}
@@ -242,10 +242,10 @@ export default function TimerDisplay() {
 
       {/* Session Info */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center">
-        <div className="text-xs text-white/50 mb-2">
+        <div className="text-xs text-muted-foreground mb-2">
           Session {timerState.sessionCount}
         </div>
-        <div className="text-xs text-white/40">
+        <div className="text-xs text-muted-foreground/60">
           Today's focused time: {Math.floor((todayStats?.totalTime || 0) / 60)} minutes
         </div>
       </div>
