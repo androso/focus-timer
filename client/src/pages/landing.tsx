@@ -27,8 +27,8 @@ export default function Landing() {
             Boost Your <span className="gradient-text">Productivity</span>
           </h1>
           <p className="text-xl text-white/85 minimal-text max-w-2xl mx-auto mb-8">
-            Track your work sessions, take meaningful breaks, and achieve your goals with our 
-            minimalist productivity timer.
+            Track your focused work time with our minimalist stopwatch timer. Start, pause, and 
+            monitor your productivity sessions with detailed analytics.
           </p>
           <Button 
             size="lg" 
@@ -43,9 +43,9 @@ export default function Landing() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           <div className="glass-card p-6 text-center hover:bg-white/10 transition-all">
             <Clock className="w-12 h-12 mx-auto text-primary mb-4" />
-            <h3 className="text-lg minimal-heading text-white/95 mb-2">Focus Timer</h3>
+            <h3 className="text-lg minimal-heading text-white/95 mb-2">Stopwatch Timer</h3>
             <p className="text-white/75 minimal-text text-sm">
-              25-minute focused work sessions with automatic break reminders
+              Track your work sessions from start to finish with flexible timing
             </p>
           </div>
 
@@ -80,7 +80,7 @@ export default function Landing() {
             Ready to Focus?
           </h2>
           <p className="text-white/85 minimal-text mb-8 max-w-md mx-auto">
-            Join thousands of users who have improved their productivity with our timer.
+            Join thousands of users who track their focused work time and improve productivity.
           </p>
           <Button 
             size="lg"
