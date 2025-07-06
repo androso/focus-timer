@@ -1,17 +1,13 @@
+
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import { Clock, BarChart3, User, LogOut } from "lucide-react";
+import { Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import TimerDisplay from "@/components/timer-display";
-import TodayStats from "@/components/today-stats";
-import RecentSessions from "@/components/recent-sessions";
-import WeeklyOverview from "@/components/weekly-overview";
+import ReportsSection from "@/components/reports-section";
 
-
-export default function Home() {
+export default function Reports() {
   const { toast } = useToast();
   const { isAuthenticated, isLoading, user } = useAuth();
 
@@ -56,23 +52,19 @@ export default function Home() {
               <span className="text-xl font-semibold text-foreground">Focus Timer</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/reports">
+              <Link href="/">
                 <Button variant="ghost" size="sm" className="text-foreground hover:text-primary">
-                  <BarChart3 className="w-4 h-4 mr-2" />
-                  Reports
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm" className="text-foreground hover:text-primary">
-                <User className="w-4 h-4 mr-2" />
-                {user?.firstName || user?.email || 'Profile'}
-              </Button>
               <Button 
                 variant="ghost" 
                 size="sm" 
                 onClick={() => window.location.href = '/api/logout'}
                 className="text-foreground hover:text-primary"
               >
-                <LogOut className="w-4 h-4" />
+                <Clock className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -81,19 +73,12 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Timer Section */}
-        <section className="text-center mb-12">
-          <TimerDisplay />
-        </section>
-
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <TodayStats />
-          <RecentSessions />
-          <WeeklyOverview />
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Reports & Analytics</h1>
+          <p className="text-muted-foreground">Detailed view of your productivity sessions and statistics</p>
         </div>
-
         
+        <ReportsSection />
       </main>
     </div>
   );
