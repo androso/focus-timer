@@ -1,0 +1,168 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Play, Coffee, Check, X } from "lucide-react";
+import type { WorkSession } from "@shared/schema";
+
+export default function ReportsSection() {
+  const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  const { data: sessions, isLoading } = useQuery<WorkSession[]>({
+    queryKey: ['/api/work-sessions/date', selectedDate],
+    retry: false,
+  });
+
+  const formatTime = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:00`;
+  };
+
+  const formatSessionTime = (date: Date) => {
+    return new Date(date).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  const getSessionTypeIcon = (type: string) => {
+    return type === 'work' ? (
+      <Play className="w-4 h-4 mr-1 text-primary" />
+    ) : (
+      <Coffee className="w-4 h-4 mr-1 text-accent" />
+    );
+  };
+
+  const getStatusBadge = (completed: boolean) => {
+    return completed ? (
+      <Badge variant="default" className="bg-success hover:bg-success/80">
+        <Check className="w-3 h-3 mr-1" />
+        Completed
+      </Badge>
+    ) : (
+      <Badge variant="secondary">
+        <X className="w-3 h-3 mr-1" />
+        Interrupted
+      </Badge>
+    );
+  };
+
+  return (
+    <section className="mt-12">
+      <Card className="stat-card">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-xl font-semibold text-foreground">
+              Detailed Reports
+            </CardTitle>
+            <div className="flex space-x-2">
+              <Button
+                variant={activeTab === 'daily' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('daily')}
+                className={activeTab === 'daily' ? 'bg-primary text-primary-foreground' : ''}
+              >
+                Daily
+              </Button>
+              <Button
+                variant={activeTab === 'weekly' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('weekly')}
+                className={activeTab === 'weekly' ? 'bg-primary text-primary-foreground' : ''}
+              >
+                Weekly
+              </Button>
+              <Button
+                variant={activeTab === 'monthly' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setActiveTab('monthly')}
+                className={activeTab === 'monthly' ? 'bg-primary text-primary-foreground' : ''}
+              >
+                Monthly
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        
+        <CardContent>
+          {/* Date Picker */}
+          <div className="mb-6">
+            <Label htmlFor="date-picker" className="text-sm font-medium text-foreground mb-2 block">
+              Select Date
+            </Label>
+            <Input
+              id="date-picker"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="w-48"
+            />
+          </div>
+
+          {/* Session History Table */}
+          <div className="overflow-x-auto">
+            {isLoading ? (
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-muted rounded-lg animate-pulse">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-4 bg-muted-foreground rounded"></div>
+                      <div className="w-20 h-4 bg-muted-foreground rounded"></div>
+                      <div className="w-12 h-4 bg-muted-foreground rounded"></div>
+                    </div>
+                    <div className="w-20 h-6 bg-muted-foreground rounded"></div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {sessions && sessions.length > 0 ? (
+                  sessions.map((session) => (
+                    <div
+                      key={session.id}
+                      className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex items-center space-x-6">
+                        <div className="text-foreground font-medium min-w-20">
+                          {formatSessionTime(session.startTime)}
+                        </div>
+                        <div className="flex items-center">
+                          {getSessionTypeIcon(session.sessionType)}
+                          <span className="capitalize text-foreground font-medium">
+                            {session.sessionType}
+                          </span>
+                        </div>
+                        <div className="text-foreground">
+                          {formatTime(session.actualDuration)}
+                        </div>
+                      </div>
+                      <div>
+                        {getStatusBadge(session.completed)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg mb-2">No sessions found</p>
+                    <p className="text-sm">Start a timer session to see your reports here</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </section>
+  );
+}
