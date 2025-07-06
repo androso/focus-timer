@@ -11,7 +11,7 @@ import type { TimerSettings } from "@shared/schema";
 interface TimerState {
   isRunning: boolean;
   isPaused: boolean;
-  timeRemaining: number;
+  timeElapsed: number;
   sessionType: 'work' | 'break';
   sessionCount: number;
   startTime: Date | null;
@@ -25,7 +25,7 @@ export default function TimerDisplay() {
   const [timerState, setTimerState] = useState<TimerState>({
     isRunning: false,
     isPaused: false,
-    timeRemaining: 25 * 60, // 25 minutes in seconds
+    timeElapsed: 0, // starts at 0 and counts up
     sessionType: 'work',
     sessionCount: 1,
     startTime: null,
@@ -74,54 +74,14 @@ export default function TimerDisplay() {
     },
   });
 
-  // Update timer display
+  // Update timer display - count up instead of down
   useEffect(() => {
     if (timerState.isRunning && !timerState.isPaused) {
       intervalRef.current = setInterval(() => {
-        setTimerState(prev => {
-          if (prev.timeRemaining <= 1) {
-            // Session completed
-            const endTime = new Date();
-            const actualDuration = prev.startTime 
-              ? Math.floor((endTime.getTime() - prev.startTime.getTime()) / 1000)
-              : getSessionDuration(prev.sessionType);
-            
-            createSessionMutation.mutate({
-              sessionType: prev.sessionType,
-              plannedDuration: getSessionDuration(prev.sessionType),
-              actualDuration,
-              startTime: prev.startTime!,
-              endTime,
-              completed: true,
-            });
-
-            // Show completion notification
-            toast({
-              title: "Session Complete!",
-              description: `${prev.sessionType === 'work' ? 'Work' : 'Break'} session finished`,
-              variant: "default",
-            });
-
-            // Auto-switch to break/work
-            const nextType = prev.sessionType === 'work' ? 'break' : 'work';
-            const nextDuration = getSessionDuration(nextType);
-            
-            return {
-              ...prev,
-              isRunning: false,
-              isPaused: false,
-              timeRemaining: nextDuration,
-              sessionType: nextType,
-              sessionCount: prev.sessionType === 'work' ? prev.sessionCount + 1 : prev.sessionCount,
-              startTime: null,
-            };
-          }
-          
-          return {
-            ...prev,
-            timeRemaining: prev.timeRemaining - 1,
-          };
-        });
+        setTimerState(prev => ({
+          ...prev,
+          timeElapsed: prev.timeElapsed + 1,
+        }));
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -135,17 +95,9 @@ export default function TimerDisplay() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [timerState.isRunning, timerState.isPaused, createSessionMutation, toast]);
+  }, [timerState.isRunning, timerState.isPaused]);
 
-  // Initialize timer duration when settings change
-  useEffect(() => {
-    if (settings && !timerState.isRunning) {
-      setTimerState(prev => ({
-        ...prev,
-        timeRemaining: getSessionDuration(prev.sessionType),
-      }));
-    }
-  }, [settings, timerState.isRunning]);
+  // No need to initialize from settings since we count up from 0
 
   const getSessionDuration = (type: 'work' | 'break') => {
     const workDuration = settings?.workDuration || 25;
@@ -170,40 +122,53 @@ export default function TimerDisplay() {
   };
 
   const stopTimer = () => {
-    // Save incomplete session if it was started
-    if (timerState.startTime) {
+    // Save session when stopped
+    if (timerState.startTime && timerState.timeElapsed > 0) {
       const endTime = new Date();
-      const actualDuration = Math.floor((endTime.getTime() - timerState.startTime.getTime()) / 1000);
+      const actualDuration = timerState.timeElapsed;
       
       createSessionMutation.mutate({
         sessionType: timerState.sessionType,
-        plannedDuration: getSessionDuration(timerState.sessionType),
+        plannedDuration: actualDuration, // Use actual duration as planned since it's user-controlled
         actualDuration,
         startTime: timerState.startTime,
         endTime,
-        completed: false,
+        completed: true, // Consider it completed when user manually stops
+      });
+
+      toast({
+        title: "Session Saved!",
+        description: `${timerState.sessionType === 'work' ? 'Work' : 'Break'} session saved (${formatTime(actualDuration)})`,
+        variant: "default",
       });
     }
 
+    // Reset timer
     setTimerState(prev => ({
       ...prev,
       isRunning: false,
       isPaused: false,
-      timeRemaining: getSessionDuration(prev.sessionType),
+      timeElapsed: 0,
       startTime: null,
+      sessionCount: prev.sessionType === 'work' && timerState.timeElapsed > 0 ? prev.sessionCount + 1 : prev.sessionCount,
     }));
   };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
+    
+    if (hours > 0) {
+      return `${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // For stopwatch mode, we'll show progress as a simple rotating circle
   const getProgress = () => {
-    const totalDuration = getSessionDuration(timerState.sessionType);
-    const elapsed = totalDuration - timerState.timeRemaining;
-    return (elapsed / totalDuration) * 100;
+    // Simple animation that rotates every 60 seconds
+    return (timerState.timeElapsed % 60) * (100 / 60);
   };
 
   const circumference = 2 * Math.PI * 45;
@@ -213,8 +178,11 @@ export default function TimerDisplay() {
     <Card className="max-w-md mx-auto stat-card">
       <CardHeader>
         <CardTitle className="text-2xl font-semibold text-center">
-          {timerState.sessionType === 'work' ? 'Work Session' : 'Break Time'}
+          Stopwatch Timer
         </CardTitle>
+        <p className="text-center text-muted-foreground">
+          {timerState.sessionType === 'work' ? 'Focus Session' : 'Break Session'}
+        </p>
       </CardHeader>
       <CardContent className="text-center">
         {/* Timer Display */}
@@ -246,7 +214,7 @@ export default function TimerDisplay() {
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-4xl font-bold text-foreground timer-display">
-                {formatTime(timerState.timeRemaining)}
+                {formatTime(timerState.timeElapsed)}
               </span>
             </div>
           </div>
@@ -283,6 +251,32 @@ export default function TimerDisplay() {
             <Square className="w-4 h-4 mr-2" />
             Stop
           </Button>
+        </div>
+
+        {/* Session Type Toggle */}
+        <div className="mb-4 flex justify-center space-x-2">
+          <button
+            onClick={() => setTimerState(prev => ({ ...prev, sessionType: 'work' }))}
+            disabled={timerState.isRunning}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              timerState.sessionType === 'work'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            Work Session
+          </button>
+          <button
+            onClick={() => setTimerState(prev => ({ ...prev, sessionType: 'break' }))}
+            disabled={timerState.isRunning}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              timerState.sessionType === 'break'
+                ? 'bg-accent text-accent-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            Break Session
+          </button>
         </div>
 
         {/* Session Info */}
