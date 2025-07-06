@@ -10,7 +10,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <Clock className="text-white/90 text-2xl mr-3" />
+              <Clock className="text-white mr-3" />
               <span className="text-xl minimal-text text-white/90">Focus Timer</span>
             </div>
             <Button onClick={() => window.location.href = '/api/login'} className="glass-effect hover:bg-white/20 text-white border-white/20">
@@ -42,7 +42,7 @@ export default function Landing() {
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           <div className="glass-card p-6 text-center hover:bg-white/10 transition-all">
-            <Clock className="w-12 h-12 mx-auto text-primary mb-4" />
+            <Clock className="w-12 h-12 mx-auto text-white mb-4" />
             <h3 className="text-lg minimal-heading text-white/95 mb-2">Stopwatch Timer</h3>
             <p className="text-white/75 minimal-text text-sm">
               Track your work sessions from start to finish with flexible timing
@@ -50,7 +50,7 @@ export default function Landing() {
           </div>
 
           <div className="glass-card p-6 text-center hover:bg-white/10 transition-all">
-            <BarChart3 className="w-12 h-12 mx-auto text-secondary mb-4" />
+            <BarChart3 className="w-12 h-12 mx-auto text-white mb-4" />
             <h3 className="text-lg minimal-heading text-white/95 mb-2">Progress Tracking</h3>
             <p className="text-white/75 minimal-text text-sm">
               Detailed analytics and reports to monitor your productivity trends
@@ -58,7 +58,7 @@ export default function Landing() {
           </div>
 
           <div className="glass-card p-6 text-center hover:bg-white/10 transition-all">
-            <Target className="w-12 h-12 mx-auto text-success mb-4" />
+            <Target className="w-12 h-12 mx-auto text-white mb-4" />
             <h3 className="text-lg minimal-heading text-white/95 mb-2">Goal Setting</h3>
             <p className="text-white/75 minimal-text text-sm">
               Set daily and weekly goals to stay motivated and focused
@@ -66,7 +66,7 @@ export default function Landing() {
           </div>
 
           <div className="glass-card p-6 text-center hover:bg-white/10 transition-all">
-            <Users className="w-12 h-12 mx-auto text-accent mb-4" />
+            <Users className="w-12 h-12 mx-auto text-white mb-4" />
             <h3 className="text-lg minimal-heading text-white/95 mb-2">User Friendly</h3>
             <p className="text-white/75 minimal-text text-sm">
               Clean, distraction-free interface inspired by the best productivity apps
