@@ -223,4 +223,38 @@
     width: 180px;
     height: 180px;
   }
+
+  .mobile-header {
+    top: 1.5rem !important;
+  }
+
+  .mobile-timer-container {
+    margin-bottom: 6rem !important;
+    margin-top: 2rem;
+  }
+
+  .mobile-timer-display {
+    font-size: 4rem !important;
+    line-height: 1.1;
+  }
+
+  .mobile-controls {
+    space-x: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .mobile-control-button {
+    width: 3.5rem !important;
+    height: 3.5rem !important;
+  }
+
+  .mobile-play-button {
+    width: 4rem !important;
+    height: 4rem !important;
+  }
+
+  .mobile-session-info {
+    bottom: 3rem !important;
+    padding: 0 1rem;
+  }
 }
