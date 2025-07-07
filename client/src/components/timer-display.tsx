@@ -37,8 +37,16 @@ export default function TimerDisplay() {
   });
 
   // Fetch today's stats for focused time
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const { data: todayStats } = useQuery<{totalTime: number}>({
-    queryKey: ['/api/stats/today'],
+    queryKey: ['/api/stats/today', userTimezone],
+    queryFn: async () => {
+      const response = await fetch(`/api/stats/today?timezone=${encodeURIComponent(userTimezone)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch today stats');
+      }
+      return response.json();
+    },
     retry: false,
   });
 

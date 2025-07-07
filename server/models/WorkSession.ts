@@ -25,20 +25,30 @@ export class WorkSessionModel {
   }
 
   static async getWorkSessionsByUserAndDate(userId: string, date: Date, timezone?: string): Promise<WorkSession[]> {
-    // If timezone is provided, use it; otherwise use the date as-is (assuming it's already in user's timezone)
     let startOfDay: Date;
     let endOfDay: Date;
     
     if (timezone) {
       // Create timezone-aware dates
       const dateStr = date.toISOString().split('T')[0]; // Get YYYY-MM-DD
-      startOfDay = new Date(`${dateStr}T00:00:00.000`);
-      endOfDay = new Date(`${dateStr}T23:59:59.999`);
+      const targetDate = new Date(`${dateStr}T12:00:00.000`); // Use noon to avoid DST issues
+      const userDate = new Date(targetDate.toLocaleString("en-US", {timeZone: timezone}));
       
-      // Adjust for timezone offset
-      const offsetMinutes = this.getTimezoneOffset(timezone);
-      startOfDay = new Date(startOfDay.getTime() - (offsetMinutes * 60000));
-      endOfDay = new Date(endOfDay.getTime() - (offsetMinutes * 60000));
+      startOfDay = new Date(userDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      
+      endOfDay = new Date(userDate);
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      // Convert to UTC for database query
+      const startOfDayUTC = new Date(startOfDay.toLocaleString("en-US", {timeZone: "UTC"}));
+      const endOfDayUTC = new Date(endOfDay.toLocaleString("en-US", {timeZone: "UTC"}));
+      
+      const offsetStart = startOfDay.getTime() - startOfDayUTC.getTime();
+      const offsetEnd = endOfDay.getTime() - endOfDayUTC.getTime();
+      
+      startOfDay = new Date(startOfDay.getTime() - offsetStart);
+      endOfDay = new Date(endOfDay.getTime() - offsetEnd);
     } else {
       startOfDay = new Date(date);
       startOfDay.setHours(0, 0, 0, 0);
@@ -96,30 +106,37 @@ export class WorkSessionModel {
     totalTime: number;
     efficiency: number;
   }> {
-    let today: Date;
-    let tomorrow: Date;
+    let startOfDay: Date;
+    let endOfDay: Date;
     
     if (timezone) {
-      // Get current date in user's timezone
+      // Get current date in user's timezone using proper timezone handling
       const now = new Date();
-      const offsetMinutes = this.getTimezoneOffset(timezone);
-      const userNow = new Date(now.getTime() - (offsetMinutes * 60000));
+      const userNow = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
       
-      today = new Date(userNow);
-      today.setHours(0, 0, 0, 0);
+      // Create start and end of day in user's timezone
+      startOfDay = new Date(userNow);
+      startOfDay.setHours(0, 0, 0, 0);
       
-      tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      endOfDay = new Date(userNow);
+      endOfDay.setHours(23, 59, 59, 999);
       
-      // Convert back to UTC for database query
-      today = new Date(today.getTime() + (offsetMinutes * 60000));
-      tomorrow = new Date(tomorrow.getTime() + (offsetMinutes * 60000));
+      // Convert to UTC for database query
+      const startOfDayUTC = new Date(startOfDay.toLocaleString("en-US", {timeZone: "UTC"}));
+      const endOfDayUTC = new Date(endOfDay.toLocaleString("en-US", {timeZone: "UTC"}));
+      
+      // Adjust for timezone offset
+      const offsetStart = startOfDay.getTime() - startOfDayUTC.getTime();
+      const offsetEnd = endOfDay.getTime() - endOfDayUTC.getTime();
+      
+      startOfDay = new Date(startOfDay.getTime() - offsetStart);
+      endOfDay = new Date(endOfDay.getTime() - offsetEnd);
     } else {
-      today = new Date();
-      today.setHours(0, 0, 0, 0);
+      startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
       
-      tomorrow = new Date(today);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
     }
 
     const sessions = await db
@@ -128,8 +145,8 @@ export class WorkSessionModel {
       .where(
         and(
           eq(workSessions.userId, userId),
-          gte(workSessions.startTime, today),
-          lte(workSessions.startTime, tomorrow),
+          gte(workSessions.startTime, startOfDay),
+          lte(workSessions.startTime, endOfDay),
           eq(workSessions.sessionType, 'work')
         )
       );
@@ -150,28 +167,32 @@ export class WorkSessionModel {
     day: string;
     totalTime: number;
   }[]> {
-    let today: Date;
     let startOfWeek: Date;
     let endOfWeek: Date;
     
     if (timezone) {
-      // Get current date in user's timezone
+      // Get current date in user's timezone using proper timezone handling
       const now = new Date();
-      const offsetMinutes = this.getTimezoneOffset(timezone);
-      today = new Date(now.getTime() - (offsetMinutes * 60000));
+      const userNow = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
       
-      startOfWeek = new Date(today);
-      startOfWeek.setDate(today.getDate() - today.getDay());
+      startOfWeek = new Date(userNow);
+      startOfWeek.setDate(userNow.getDate() - userNow.getDay());
       startOfWeek.setHours(0, 0, 0, 0);
 
       endOfWeek = new Date(startOfWeek);
       endOfWeek.setDate(startOfWeek.getDate() + 7);
       
-      // Convert back to UTC for database query
-      startOfWeek = new Date(startOfWeek.getTime() + (offsetMinutes * 60000));
-      endOfWeek = new Date(endOfWeek.getTime() + (offsetMinutes * 60000));
+      // Convert to UTC for database query
+      const startOfWeekUTC = new Date(startOfWeek.toLocaleString("en-US", {timeZone: "UTC"}));
+      const endOfWeekUTC = new Date(endOfWeek.toLocaleString("en-US", {timeZone: "UTC"}));
+      
+      const offsetStart = startOfWeek.getTime() - startOfWeekUTC.getTime();
+      const offsetEnd = endOfWeek.getTime() - endOfWeekUTC.getTime();
+      
+      startOfWeek = new Date(startOfWeek.getTime() - offsetStart);
+      endOfWeek = new Date(endOfWeek.getTime() - offsetEnd);
     } else {
-      today = new Date();
+      const today = new Date();
       startOfWeek = new Date(today);
       startOfWeek.setDate(today.getDate() - today.getDay());
       startOfWeek.setHours(0, 0, 0, 0);
@@ -199,8 +220,7 @@ export class WorkSessionModel {
       // Adjust session time to user's timezone for day calculation
       let sessionTime = session.startTime;
       if (timezone) {
-        const offsetMinutes = this.getTimezoneOffset(timezone);
-        sessionTime = new Date(session.startTime.getTime() - (offsetMinutes * 60000));
+        sessionTime = new Date(session.startTime.toLocaleString("en-US", {timeZone: timezone}));
       }
       
       const dayIndex = sessionTime.getDay();
