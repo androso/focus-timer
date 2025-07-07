@@ -121,6 +121,16 @@ Changelog:
   - Moved `storage.ts` to `/server/services/storage.ts`
   - Updated all import statements to reflect new file locations
   - Separated concerns for better code organization and maintainability
+- July 07, 2025. Major timezone enhancement implementation:
+  - Added `timezone` field to users table with default "UTC"
+  - Implemented proper timezone handling using date-fns-tz library
+  - All timestamps stored in UTC in database, converted to user timezone for display and calculations
+  - Day boundaries now calculated correctly based on user's timezone (e.g., El Salvador timezone)
+  - Auto-detection of user timezone on first login with storage in user profile
+  - Updated all stats calculations (today's stats, weekly stats) to use user's timezone
+  - Added API endpoint for updating user timezone preferences
+  - Frontend components now use stored user timezone instead of browser detection
+  - Ensures daily progress resets at midnight in user's local timezone, not UTC
 
 ## User Preferences
 

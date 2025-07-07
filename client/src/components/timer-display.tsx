@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Square, BarChart3, LogOut } from "lucide-react";
@@ -37,7 +38,8 @@ export default function TimerDisplay() {
   });
 
   // Fetch today's stats for focused time
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const { user } = useAuth();
+  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
   const { data: todayStats } = useQuery<{totalTime: number}>({
     queryKey: ['/api/stats/today', userTimezone],
     queryFn: async () => {
@@ -48,6 +50,7 @@ export default function TimerDisplay() {
       return response.json();
     },
     retry: false,
+    enabled: !!user, // Only fetch when user is loaded
   });
 
   // Fetch active timer session

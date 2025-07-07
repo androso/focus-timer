@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface WeeklyStats {
   day: string;
@@ -8,7 +9,8 @@ interface WeeklyStats {
 }
 
 export default function WeeklyOverview() {
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const { user } = useAuth();
+  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: weeklyData, isLoading } = useQuery<{
     day: string;
@@ -23,6 +25,7 @@ export default function WeeklyOverview() {
       return response.json();
     },
     retry: false,
+    enabled: !!user, // Only fetch when user is loaded
   });
 
   const formatTime = (seconds: number) => {

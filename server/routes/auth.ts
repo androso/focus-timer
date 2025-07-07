@@ -6,5 +6,6 @@ const router = Router();
 
 // Auth routes
 router.get('/user', isAuthenticated, UserController.getCurrentUser);
+router.patch('/user/timezone', isAuthenticated, UserController.updateUserTimezone);
 
 export default router;

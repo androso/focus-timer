@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Clock, TrendingUp } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TodayStats {
   completedSessions: number;
@@ -9,7 +10,8 @@ interface TodayStats {
 }
 
 export default function TodayStats() {
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const { user } = useAuth();
+  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: stats, isLoading } = useQuery<{
     completedSessions: number;
@@ -25,6 +27,7 @@ export default function TodayStats() {
       return response.json();
     },
     retry: false,
+    enabled: !!user, // Only fetch when user is loaded
   });
 
   const formatTime = (seconds: number) => {

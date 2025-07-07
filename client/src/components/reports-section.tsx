@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Play, Check, X } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import type { WorkSession } from "@shared/schema";
 
 export default function ReportsSection() {
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const { user } = useAuth();
+  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
     queryKey: ['/api/work-sessions/date', selectedDate, userTimezone],
@@ -24,6 +26,7 @@ export default function ReportsSection() {
       return response.json();
     },
     retry: false,
+    enabled: !!user, // Only fetch when user is loaded
   });
 
   const formatTime = (seconds: number) => {
