@@ -61,6 +61,20 @@ export const timerSettings = pgTable("timer_settings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Active timer sessions table
+export const activeTimerSessions = pgTable("active_timer_sessions", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id).unique(),
+  sessionType: varchar("session_type").notNull(), // 'work' or 'break'
+  startTime: timestamp("start_time").notNull(),
+  timeElapsed: integer("time_elapsed").notNull().default(0), // in seconds
+  isRunning: boolean("is_running").notNull().default(true),
+  isPaused: boolean("is_paused").notNull().default(false),
+  sessionCount: integer("session_count").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Schema types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -79,8 +93,19 @@ export const insertTimerSettingsSchema = createInsertSchema(timerSettings).omit(
   updatedAt: true,
 });
 
+export const insertActiveTimerSessionSchema = createInsertSchema(activeTimerSessions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  startTime: z.string().or(z.date()).transform((val) => new Date(val)),
+});
+
 export type InsertWorkSession = z.infer<typeof insertWorkSessionSchema>;
 export type WorkSession = typeof workSessions.$inferSelect;
 
 export type InsertTimerSettings = z.infer<typeof insertTimerSettingsSchema>;
 export type TimerSettings = typeof timerSettings.$inferSelect;
+
+export type InsertActiveTimerSession = z.infer<typeof insertActiveTimerSessionSchema>;
+export type ActiveTimerSession = typeof activeTimerSessions.$inferSelect;

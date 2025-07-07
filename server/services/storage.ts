@@ -2,12 +2,15 @@ import {
   users,
   workSessions,
   timerSettings,
+  activeTimerSessions,
   type User,
   type UpsertUser,
   type WorkSession,
   type InsertWorkSession,
   type TimerSettings,
   type InsertTimerSettings,
+  type ActiveTimerSession,
+  type InsertActiveTimerSession,
 } from "@shared/schema";
 import { db } from "../config/database";
 import { eq, desc, gte, lte, and, sql } from "drizzle-orm";
@@ -37,6 +40,12 @@ export interface IStorage {
   // Timer settings operations
   getTimerSettings(userId: string): Promise<TimerSettings | undefined>;
   upsertTimerSettings(settings: InsertTimerSettings): Promise<TimerSettings>;
+  
+  // Active timer session operations
+  getActiveTimerSession(userId: string): Promise<ActiveTimerSession | undefined>;
+  createActiveTimerSession(session: InsertActiveTimerSession): Promise<ActiveTimerSession>;
+  updateActiveTimerSession(userId: string, updates: Partial<InsertActiveTimerSession>): Promise<ActiveTimerSession | undefined>;
+  removeActiveTimerSession(userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -206,6 +215,44 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return timerSetting;
+  }
+
+  // Active timer session operations
+  async getActiveTimerSession(userId: string): Promise<ActiveTimerSession | undefined> {
+    const [session] = await db
+      .select()
+      .from(activeTimerSessions)
+      .where(eq(activeTimerSessions.userId, userId));
+    return session;
+  }
+
+  async createActiveTimerSession(session: InsertActiveTimerSession): Promise<ActiveTimerSession> {
+    // First, remove any existing active session for this user
+    await this.removeActiveTimerSession(session.userId);
+    
+    const [activeSession] = await db
+      .insert(activeTimerSessions)
+      .values(session)
+      .returning();
+    return activeSession;
+  }
+
+  async updateActiveTimerSession(userId: string, updates: Partial<InsertActiveTimerSession>): Promise<ActiveTimerSession | undefined> {
+    const [updatedSession] = await db
+      .update(activeTimerSessions)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(activeTimerSessions.userId, userId))
+      .returning();
+    return updatedSession;
+  }
+
+  async removeActiveTimerSession(userId: string): Promise<void> {
+    await db
+      .delete(activeTimerSessions)
+      .where(eq(activeTimerSessions.userId, userId));
   }
 }
 

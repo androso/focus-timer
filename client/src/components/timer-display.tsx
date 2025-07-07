@@ -6,7 +6,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Square, BarChart3, LogOut } from "lucide-react";
 import { Link } from "wouter";
-import type { TimerSettings } from "@shared/schema";
+import type { TimerSettings, ActiveTimerSession } from "@shared/schema";
 
 interface TimerState {
   isRunning: boolean;
@@ -20,6 +20,7 @@ export default function TimerDisplay() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [timerState, setTimerState] = useState<TimerState>({
     isRunning: false,
@@ -41,62 +42,136 @@ export default function TimerDisplay() {
     retry: false,
   });
 
-  // Create work session mutation
-  const createSessionMutation = useMutation({
-    mutationFn: async (sessionData: {
-      sessionType: string;
-      plannedDuration: number;
-      actualDuration: number;
-      startTime: Date;
-      endTime: Date;
-      completed: boolean;
-    }) => {
-      // Convert dates to ISO strings for proper serialization
-      const payload = {
-        ...sessionData,
-        startTime: sessionData.startTime.toISOString(),
-        endTime: sessionData.endTime.toISOString(),
-      };
-      await apiRequest('POST', '/api/work-sessions', payload);
+  // Fetch active timer session
+  const { data: activeSession, isLoading: isActiveSessionLoading } = useQuery<ActiveTimerSession & { currentElapsedTime: number }>({
+    queryKey: ['/api/active-timer-session'],
+    retry: false,
+    refetchInterval: 30000, // Refetch every 30 seconds to sync with server
+  });
+
+  // Create active timer session mutation
+  const createActiveSessionMutation = useMutation({
+    mutationFn: async (sessionData: any) => {
+      return await apiRequest('POST', '/api/active-timer-session', sessionData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/work-sessions'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/stats/today'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/stats/weekly'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/active-timer-session'] });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: "Session Expired",
+          description: "Please sign in again",
           variant: "destructive",
         });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to start timer session",
+          variant: "destructive",
+        });
       }
-      toast({
-        title: "Error",
-        description: "Failed to save session",
-        variant: "destructive",
-      });
     },
   });
 
-  // Update timer display
+  // Update active timer session mutation
+  const updateActiveSessionMutation = useMutation({
+    mutationFn: async (updates: any) => {
+      return await apiRequest('PATCH', '/api/active-timer-session', updates);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/active-timer-session'] });
+    },
+    onError: (error) => {
+      console.error("Failed to update timer session:", error);
+    },
+  });
+
+  // Stop and save active timer session mutation
+  const stopAndSaveSessionMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('POST', '/api/active-timer-session/stop');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/active-timer-session'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/stats/today'] });
+      toast({
+        title: "Work Session Saved!",
+        description: "Your session has been saved successfully",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Session Expired",
+          description: "Please sign in again",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save work session",
+          variant: "destructive",
+        });
+      }
+    },
+  });
+
+  // Sync local timer state with active session from server
   useEffect(() => {
-    if (timerState.isRunning && !timerState.isPaused) {
+    if (activeSession && !isActiveSessionLoading) {
+      const currentTime = Math.floor((new Date().getTime() - new Date(activeSession.startTime).getTime()) / 1000);
+      
+      setTimerState(prev => ({
+        ...prev,
+        isRunning: activeSession.isRunning,
+        isPaused: activeSession.isPaused,
+        timeElapsed: activeSession.isPaused ? activeSession.timeElapsed : currentTime,
+        sessionCount: activeSession.sessionCount || 1,
+        startTime: new Date(activeSession.startTime),
+      }));
+    } else if (!activeSession && !isActiveSessionLoading) {
+      // No active session, reset timer state
+      setTimerState({
+        isRunning: false,
+        isPaused: false,
+        timeElapsed: 0,
+        sessionCount: 1,
+        startTime: null,
+      });
+    }
+  }, [activeSession, isActiveSessionLoading]);
+
+  // Update local timer display and periodically save to server
+  useEffect(() => {
+    if (timerState.isRunning && !timerState.isPaused && activeSession) {
       intervalRef.current = setInterval(() => {
         setTimerState(prev => ({
           ...prev,
           timeElapsed: prev.timeElapsed + 1,
         }));
       }, 1000);
+
+      // Auto-save every 30 seconds to prevent data loss
+      saveIntervalRef.current = setInterval(() => {
+        if (timerState.startTime) {
+          const currentElapsed = Math.floor((new Date().getTime() - timerState.startTime.getTime()) / 1000);
+          updateActiveSessionMutation.mutate({
+            timeElapsed: currentElapsed,
+            isRunning: true,
+            isPaused: false,
+          });
+        }
+      }, 30000);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
+      }
+      if (saveIntervalRef.current) {
+        clearInterval(saveIntervalRef.current);
+        saveIntervalRef.current = null;
       }
     }
 
@@ -104,8 +179,34 @@ export default function TimerDisplay() {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
+      if (saveIntervalRef.current) {
+        clearInterval(saveIntervalRef.current);
+      }
     };
-  }, [timerState.isRunning, timerState.isPaused]);
+  }, [timerState.isRunning, timerState.isPaused, timerState.startTime, activeSession]);
+
+  // Save timer state before page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (activeSession && timerState.isRunning && timerState.startTime) {
+        const currentElapsed = Math.floor((new Date().getTime() - timerState.startTime.getTime()) / 1000);
+        
+        // Use navigator.sendBeacon for reliable data sending during page unload
+        const data = JSON.stringify({
+          timeElapsed: currentElapsed,
+          isRunning: timerState.isRunning,
+          isPaused: timerState.isPaused,
+        });
+        
+        navigator.sendBeacon('/api/active-timer-session', data);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [activeSession, timerState.isRunning, timerState.isPaused, timerState.startTime]);
 
   // Update document title with timer
   useEffect(() => {
@@ -123,52 +224,47 @@ export default function TimerDisplay() {
   }, [timerState.timeElapsed, timerState.isRunning, timerState.isPaused]);
 
   const startTimer = () => {
-    setTimerState(prev => ({
-      ...prev,
-      isRunning: true,
-      isPaused: false,
-      startTime: prev.startTime || new Date(),
-    }));
+    if (!activeSession) {
+      // Create new active session
+      createActiveSessionMutation.mutate({
+        sessionType: 'work',
+        startTime: new Date().toISOString(),
+        timeElapsed: 0,
+        isRunning: true,
+        isPaused: false,
+        sessionCount: 1,
+      });
+    } else {
+      // Resume existing session
+      const currentElapsed = timerState.isPaused 
+        ? timerState.timeElapsed 
+        : Math.floor((new Date().getTime() - new Date(activeSession.startTime).getTime()) / 1000);
+      
+      updateActiveSessionMutation.mutate({
+        isRunning: true,
+        isPaused: false,
+        timeElapsed: currentElapsed,
+      });
+    }
   };
 
   const pauseTimer = () => {
-    setTimerState(prev => ({
-      ...prev,
-      isPaused: !prev.isPaused,
-    }));
+    if (activeSession && timerState.startTime) {
+      const currentElapsed = Math.floor((new Date().getTime() - timerState.startTime.getTime()) / 1000);
+      
+      updateActiveSessionMutation.mutate({
+        isRunning: true,
+        isPaused: !timerState.isPaused,
+        timeElapsed: currentElapsed,
+      });
+    }
   };
 
   const stopTimer = () => {
-    // Save session when stopped
-    if (timerState.startTime && timerState.timeElapsed > 0) {
-      const endTime = new Date();
-      const actualDuration = timerState.timeElapsed;
-
-      createSessionMutation.mutate({
-        sessionType: 'work',
-        plannedDuration: actualDuration,
-        actualDuration,
-        startTime: timerState.startTime,
-        endTime,
-        completed: true,
-      });
-
-      toast({
-        title: "Work Session Saved!",
-        description: `Session saved (${formatTime(actualDuration)})`,
-        variant: "default",
-      });
+    if (activeSession) {
+      // Stop and save the active session
+      stopAndSaveSessionMutation.mutate();
     }
-
-    // Reset timer
-    setTimerState(prev => ({
-      ...prev,
-      isRunning: false,
-      isPaused: false,
-      timeElapsed: 0,
-      startTime: null,
-      sessionCount: timerState.timeElapsed > 0 ? prev.sessionCount + 1 : prev.sessionCount,
-    }));
   };
 
   const formatTime = (seconds: number) => {

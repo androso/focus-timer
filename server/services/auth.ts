@@ -115,7 +115,44 @@ export async function setupAuth(app: Express) {
     })(req, res, next);
   });
 
-  app.get("/api/logout", (req, res) => {
+  app.get("/api/logout", async (req: any, res) => {
+    // Save any active timer session before logout
+    if (req.user && req.user.claims && req.user.claims.sub) {
+      try {
+        const { ActiveTimerSessionModel } = await import('../models/ActiveTimerSession');
+        const { WorkSessionModel } = await import('../models/WorkSession');
+        
+        const userId = req.user.claims.sub;
+        const activeSession = await ActiveTimerSessionModel.getActiveSession(userId);
+        
+        if (activeSession) {
+          // Calculate final elapsed time
+          const finalElapsedTime = await ActiveTimerSessionModel.getElapsedTime(activeSession);
+          
+          // Save if there's meaningful time elapsed (more than 0 seconds)
+          if (finalElapsedTime > 0) {
+            const endTime = new Date();
+            
+            await WorkSessionModel.createWorkSession({
+              userId,
+              sessionType: activeSession.sessionType,
+              plannedDuration: finalElapsedTime,
+              actualDuration: finalElapsedTime,
+              startTime: activeSession.startTime,
+              endTime,
+              completed: true,
+            });
+          }
+
+          // Remove the active session
+          await ActiveTimerSessionModel.removeActiveSession(userId);
+        }
+      } catch (error) {
+        console.error("Error saving active session on logout:", error);
+        // Continue with logout even if session saving fails
+      }
+    }
+    
     req.logout(() => {
       res.redirect(
         client.buildEndSessionUrl(config, {
