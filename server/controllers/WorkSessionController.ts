@@ -10,7 +10,7 @@ export class WorkSessionController {
         ...req.body,
         userId,
       });
-      
+
       const session = await WorkSessionModel.createWorkSession(sessionData);
       res.json(session);
     } catch (error) {
@@ -34,11 +34,11 @@ export class WorkSessionController {
     try {
       const userId = req.user.claims.sub;
       const { date } = req.query;
-      
+
       if (!date || typeof date !== 'string') {
         return res.status(400).json({ message: "Date parameter is required" });
       }
-      
+
       const targetDate = new Date(date);
       const sessions = await WorkSessionModel.getWorkSessionsByUserAndDate(userId, targetDate);
       res.json(sessions);
@@ -52,11 +52,11 @@ export class WorkSessionController {
     try {
       const userId = req.user.claims.sub;
       const { startDate, endDate } = req.query;
-      
+
       if (!startDate || !endDate || typeof startDate !== 'string' || typeof endDate !== 'string') {
         return res.status(400).json({ message: "Start date and end date parameters are required" });
       }
-      
+
       const start = new Date(startDate);
       const end = new Date(endDate);
       const sessions = await WorkSessionModel.getWorkSessionsByUserAndDateRange(userId, start, end);

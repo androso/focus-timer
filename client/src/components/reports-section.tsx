@@ -14,6 +14,13 @@ export default function ReportsSection() {
 
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
     queryKey: ['/api/work-sessions/date', selectedDate],
+    queryFn: async () => {
+      const response = await fetch(`/api/work-sessions/date?date=${selectedDate}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch sessions');
+      }
+      return response.json();
+    },
     retry: false,
   });
 
