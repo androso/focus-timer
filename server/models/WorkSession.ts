@@ -5,7 +5,7 @@ import {
 } from "@shared/schema";
 import { db } from "../config/database";
 import { eq, desc, gte, lte, and } from "drizzle-orm";
-import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { startOfDay, endOfDay, startOfWeek, addDays } from "date-fns";
 
 export class WorkSessionModel {
@@ -27,14 +27,16 @@ export class WorkSessionModel {
   }
 
   static async getWorkSessionsByUserAndDate(userId: string, date: Date, timezone: string = "UTC"): Promise<WorkSession[]> {
-    // Get start and end of the specified date in user's timezone
-    const userDate = toZonedTime(date, timezone);
-    const startOfUserDay = startOfDay(userDate);
-    const endOfUserDay = endOfDay(userDate);
+    // Format the date to get start and end of day in the target timezone
+    const dateStr = formatInTimeZone(date, timezone, 'yyyy-MM-dd');
     
-    // Convert back to UTC for database query
-    const startOfDayUTC = fromZonedTime(startOfUserDay, timezone);
-    const endOfDayUTC = fromZonedTime(endOfUserDay, timezone);
+    // Create start of day (00:00:00) and end of day (23:59:59) in the target timezone
+    const startOfDayString = `${dateStr} 00:00:00`;
+    const endOfDayString = `${dateStr} 23:59:59`;
+    
+    // Convert to UTC for database query
+    const startOfDayUTC = fromZonedTime(new Date(startOfDayString), timezone);
+    const endOfDayUTC = fromZonedTime(new Date(endOfDayString), timezone);
 
     return await db
       .select()
@@ -70,17 +72,17 @@ export class WorkSessionModel {
     totalTime: number;
     efficiency: number;
   }> {
-    // Get current date in user's timezone
+    // Get today's date in the user's timezone
     const now = new Date();
-    const userNow = toZonedTime(now, timezone);
+    const todayStr = formatInTimeZone(now, timezone, 'yyyy-MM-dd');
     
-    // Get start and end of today in user's timezone
-    const startOfUserDay = startOfDay(userNow);
-    const endOfUserDay = endOfDay(userNow);
+    // Create start and end of today in the user's timezone
+    const startOfDayString = `${todayStr} 00:00:00`;
+    const endOfDayString = `${todayStr} 23:59:59`;
     
     // Convert to UTC for database query
-    const startOfDayUTC = fromZonedTime(startOfUserDay, timezone);
-    const endOfDayUTC = fromZonedTime(endOfUserDay, timezone);
+    const startOfDayUTC = fromZonedTime(new Date(startOfDayString), timezone);
+    const endOfDayUTC = fromZonedTime(new Date(endOfDayString), timezone);
 
     const sessions = await db
       .select()
@@ -112,10 +114,11 @@ export class WorkSessionModel {
   }[]> {
     // Get current date in user's timezone
     const now = new Date();
-    const userNow = toZonedTime(now, timezone);
+    const todayStr = formatInTimeZone(now, timezone, 'yyyy-MM-dd');
+    const today = new Date(todayStr);
     
     // Get start of week (Sunday) in user's timezone
-    const startOfUserWeek = startOfWeek(userNow, { weekStartsOn: 0 });
+    const startOfUserWeek = startOfWeek(today, { weekStartsOn: 0 });
     const endOfUserWeek = addDays(startOfUserWeek, 7);
     
     // Convert to UTC for database query
@@ -139,8 +142,9 @@ export class WorkSessionModel {
 
     sessions.forEach(session => {
       // Convert session time back to user's timezone for day calculation
-      const sessionTimeInUserTz = toZonedTime(session.startTime, timezone);
-      const dayIndex = sessionTimeInUserTz.getDay();
+      const sessionTimeStr = formatInTimeZone(session.startTime, timezone, 'yyyy-MM-dd');
+      const sessionDate = new Date(sessionTimeStr);
+      const dayIndex = sessionDate.getDay();
       weeklyStats[dayIndex].totalTime += session.actualDuration;
     });
 
