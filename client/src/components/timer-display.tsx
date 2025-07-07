@@ -360,7 +360,7 @@ export default function TimerDisplay() {
       {/* Session Info */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center md:bottom-8 mobile-session-info">
         <div className="text-xs text-muted-foreground mb-2 md:text-xs">
-          Session {timerState.sessionCount}
+          Session {(todayStats?.completedSessions || 0) + (timerState.isRunning ? 1 : 0)}
         </div>
         <div className="text-xs text-muted-foreground/60 md:text-xs px-4">
           Today's focused time: {Math.floor((todayStats?.totalTime || 0) / 60)}m {(todayStats?.totalTime || 0) % 60}s
