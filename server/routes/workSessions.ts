@@ -1,15 +1,11 @@
 import { Router } from "express";
-import { 
-  createWorkSession, 
-  getUserWorkSessions,
-  getUserWorkSessionsByDate 
-} from "../controllers/WorkSessionController";
+import { WorkSessionController } from "../controllers/WorkSessionController";
 import { isAuthenticated } from "../middleware/auth";
 
 const router = Router();
 
-router.post("/", isAuthenticated, createWorkSession);
-router.get("/", isAuthenticated, getUserWorkSessions);
-router.get("/date", isAuthenticated, getUserWorkSessionsByDate);
+router.post("/", isAuthenticated, WorkSessionController.createWorkSession);
+router.get("/", isAuthenticated, WorkSessionController.getWorkSessions);
+router.get("/date", isAuthenticated, WorkSessionController.getWorkSessionsByDate);
 
 export default router;
