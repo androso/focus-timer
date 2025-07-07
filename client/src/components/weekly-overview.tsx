@@ -8,15 +8,27 @@ interface WeeklyStats {
 }
 
 export default function WeeklyOverview() {
-  const { data: weeklyStats, isLoading } = useQuery<WeeklyStats[]>({
-    queryKey: ['/api/stats/weekly'],
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const { data: weeklyData, isLoading } = useQuery<{
+    day: string;
+    totalTime: number;
+  }[]>({
+    queryKey: ['/api/stats/weekly', userTimezone],
+    queryFn: async () => {
+      const response = await fetch(`/api/stats/weekly?timezone=${encodeURIComponent(userTimezone)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch weekly stats');
+      }
+      return response.json();
+    },
     retry: false,
   });
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }
@@ -49,7 +61,7 @@ export default function WeeklyOverview() {
     );
   }
 
-  const stats = weeklyStats || [];
+  const stats = weeklyData || [];
   const maxTime = Math.max(...stats.map(s => s.totalTime), 1);
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 

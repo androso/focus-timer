@@ -9,8 +9,21 @@ interface TodayStats {
 }
 
 export default function TodayStats() {
-  const { data: stats, isLoading } = useQuery<TodayStats>({
-    queryKey: ['/api/stats/today'],
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  const { data: stats, isLoading } = useQuery<{
+    completedSessions: number;
+    totalTime: number;
+    efficiency: number;
+  }>({
+    queryKey: ['/api/stats/today', userTimezone],
+    queryFn: async () => {
+      const response = await fetch(`/api/stats/today?timezone=${encodeURIComponent(userTimezone)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch today stats');
+      }
+      return response.json();
+    },
     retry: false,
   });
 

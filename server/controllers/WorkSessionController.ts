@@ -33,14 +33,18 @@ export class WorkSessionController {
   static async getWorkSessionsByDate(req: any, res: Response) {
     try {
       const userId = req.user.claims.sub;
-      const { date } = req.query;
+      const { date, timezone } = req.query;
 
       if (!date || typeof date !== 'string') {
         return res.status(400).json({ message: "Date parameter is required" });
       }
 
       const targetDate = new Date(date);
-      const sessions = await WorkSessionModel.getWorkSessionsByUserAndDate(userId, targetDate);
+      const sessions = await WorkSessionModel.getWorkSessionsByUserAndDate(
+        userId, 
+        targetDate, 
+        timezone as string
+      );
       res.json(sessions);
     } catch (error) {
       console.error("Error fetching work sessions by date:", error);
@@ -70,7 +74,8 @@ export class WorkSessionController {
   static async getTodayStats(req: any, res: Response) {
     try {
       const userId = req.user.claims.sub;
-      const stats = await WorkSessionModel.getTodayStats(userId);
+      const { timezone } = req.query;
+      const stats = await WorkSessionModel.getTodayStats(userId, timezone as string);
       res.json(stats);
     } catch (error) {
       console.error("Error fetching today's stats:", error);
@@ -81,7 +86,8 @@ export class WorkSessionController {
   static async getWeeklyStats(req: any, res: Response) {
     try {
       const userId = req.user.claims.sub;
-      const stats = await WorkSessionModel.getWeeklyStats(userId);
+      const { timezone } = req.query;
+      const stats = await WorkSessionModel.getWeeklyStats(userId, timezone as string);
       res.json(stats);
     } catch (error) {
       console.error("Error fetching weekly stats:", error);

@@ -12,10 +12,12 @@ export default function ReportsSection() {
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
-    queryKey: ['/api/work-sessions/date', selectedDate],
+    queryKey: ['/api/work-sessions/date', selectedDate, userTimezone],
     queryFn: async () => {
-      const response = await fetch(`/api/work-sessions/date?date=${selectedDate}`);
+      const response = await fetch(`/api/work-sessions/date?date=${selectedDate}&timezone=${encodeURIComponent(userTimezone)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch sessions');
       }
@@ -38,7 +40,8 @@ export default function ReportsSection() {
     return new Date(date).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: true,
+      timeZone: userTimezone
     });
   };
 
