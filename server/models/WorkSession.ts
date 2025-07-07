@@ -4,7 +4,7 @@ import {
   type InsertWorkSession,
 } from "@shared/schema";
 import { db } from "../config/database";
-import { eq, desc, gte, lte, and } from "drizzle-orm";
+import { eq, and, gte, lte, lt, desc } from "drizzle-orm";
 
 export class WorkSessionModel {
   static async createWorkSession(session: InsertWorkSession): Promise<WorkSession> {
@@ -27,7 +27,7 @@ export class WorkSessionModel {
   static async getWorkSessionsByUserAndDate(userId: string, date: Date): Promise<WorkSession[]> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(date);
     endOfDay.setHours(23, 59, 59, 999);
 
@@ -65,7 +65,7 @@ export class WorkSessionModel {
   }> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
@@ -76,7 +76,7 @@ export class WorkSessionModel {
         and(
           eq(workSessions.userId, userId),
           gte(workSessions.startTime, today),
-          lte(workSessions.startTime, tomorrow),
+          lt(workSessions.startTime, tomorrow),
           eq(workSessions.sessionType, 'work')
         )
       );
