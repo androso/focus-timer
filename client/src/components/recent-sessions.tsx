@@ -72,7 +72,7 @@ export default function RecentSessions() {
                   <div className="flex items-center">
                     <Play className="w-3 h-3 mr-1 text-primary" />
                     <p className="minimal-text text-white/90">
-                      {session.sessionType === 'work' ? 'Work Session' : 'Break Session'}
+                      Work Session
                     </p>
                   </div>
                   <p className="text-sm text-white/60 minimal-text">
