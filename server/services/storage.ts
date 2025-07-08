@@ -85,6 +85,10 @@ export class DatabaseStorage implements IStorage {
     return await WorkSessionModel.getWorkSessionsByUserAndDateRange(userId, startDate, endDate);
   }
 
+  async deleteWorkSession(sessionId: number, userId: string): Promise<boolean> {
+    return await WorkSessionModel.deleteWorkSession(sessionId, userId);
+  }
+
   async getTodayStats(userId: string, timezone?: string): Promise<{
     completedSessions: number;
     totalTime: number;

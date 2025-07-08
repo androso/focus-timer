@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Play, Check, X } from "lucide-react";
+import { Calendar, Play, Check, X, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 import type { WorkSession } from "@shared/schema";
 
 export default function ReportsSection() {
@@ -14,6 +15,8 @@ export default function ReportsSection() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
@@ -28,6 +31,42 @@ export default function ReportsSection() {
     retry: false,
     enabled: !!user, // Only fetch when user is loaded
   });
+
+  const deleteSessionMutation = useMutation({
+    mutationFn: async (sessionId: number) => {
+      const response = await fetch(`/api/work-sessions/${sessionId}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete session');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/work-sessions/date'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/work-sessions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/stats/today'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/stats/weekly'] });
+      toast({
+        title: "Session Deleted",
+        description: "Work session has been successfully deleted",
+        variant: "default",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete work session",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleDeleteSession = (sessionId: number) => {
+    if (window.confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
+      deleteSessionMutation.mutate(sessionId);
+    }
+  };
 
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -152,8 +191,18 @@ export default function ReportsSection() {
                         {formatTime(session.actualDuration)}
                       </div>
                     </div>
-                    <div>
+                    <div className="flex items-center space-x-3">
                       {getStatusBadge(session.completed)}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteSession(session.id)}
+                        disabled={deleteSessionMutation.isPending}
+                        className="text-red-400 hover:text-red-300 hover:bg-red-400/10 p-2"
+                        title="Delete session"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                 ))

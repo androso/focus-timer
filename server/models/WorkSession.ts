@@ -150,4 +150,17 @@ export class WorkSessionModel {
 
     return weeklyStats;
   }
+
+  static async deleteWorkSession(sessionId: number, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(workSessions)
+      .where(
+        and(
+          eq(workSessions.id, sessionId),
+          eq(workSessions.userId, userId)
+        )
+      );
+    
+    return result.changes > 0;
+  }
 }

@@ -94,4 +94,26 @@ export class WorkSessionController {
       res.status(500).json({ message: "Failed to fetch weekly stats" });
     }
   }
+
+  static async deleteWorkSession(req: any, res: Response) {
+    try {
+      const userId = req.user.claims.sub;
+      const sessionId = parseInt(req.params.id);
+
+      if (isNaN(sessionId)) {
+        return res.status(400).json({ message: "Invalid session ID" });
+      }
+
+      const deleted = await WorkSessionModel.deleteWorkSession(sessionId, userId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Session not found or not authorized" });
+      }
+
+      res.json({ message: "Session deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting work session:", error);
+      res.status(500).json({ message: "Failed to delete work session" });
+    }
+  }
 }
