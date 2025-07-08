@@ -100,8 +100,10 @@ export default function TimerDisplay() {
 
   // Stop and save active timer session mutation
   const stopAndSaveSessionMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest('POST', '/api/active-timer-session/stop');
+    mutationFn: async (finalElapsedTime: number) => {
+      return await apiRequest('POST', '/api/active-timer-session/stop', {
+        finalElapsedTime
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/active-timer-session'] });
@@ -260,8 +262,15 @@ export default function TimerDisplay() {
 
   const stopTimer = () => {
     if (activeSession) {
-      // Stop and save the active session
-      stopAndSaveSessionMutation.mutate();
+      // First update the active session with final elapsed time, then stop and save
+      updateActiveSessionMutation.mutate({
+        timeElapsed: timerState.timeElapsed,
+        isRunning: false,
+        isPaused: false,
+      });
+      
+      // Stop and save the active session with current elapsed time
+      stopAndSaveSessionMutation.mutate(timerState.timeElapsed);
     }
   };
 

@@ -64,22 +64,23 @@ export class ActiveTimerSessionController {
   static async stopAndSaveSession(req: any, res: Response) {
     try {
       const userId = req.user.claims.sub;
+      const { finalElapsedTime } = req.body;
       const activeSession = await ActiveTimerSessionModel.getActiveSession(userId);
       
       if (!activeSession) {
         return res.status(404).json({ message: "No active session found" });
       }
 
-      // Calculate final elapsed time
-      const finalElapsedTime = await ActiveTimerSessionModel.getElapsedTime(activeSession);
+      // Use the finalElapsedTime from the frontend, or fall back to stored value
+      const elapsedTime = finalElapsedTime || await ActiveTimerSessionModel.getElapsedTime(activeSession);
       
       // Only save if there's meaningful time elapsed (more than 0 seconds)
-      if (finalElapsedTime > 0) {
+      if (elapsedTime > 0) {
         // Create a completed work session
         await WorkSessionModel.createWorkSession({
           userId,
           sessionType: activeSession.sessionType,
-          actualDuration: finalElapsedTime,
+          actualDuration: elapsedTime,
           startTime: activeSession.startTime,
           completed: true,
         });
@@ -90,7 +91,7 @@ export class ActiveTimerSessionController {
       
       res.json({ 
         message: "Session stopped and saved",
-        elapsedTime: finalElapsedTime 
+        elapsedTime: elapsedTime 
       });
     } catch (error) {
       console.error("Error stopping and saving session:", error);

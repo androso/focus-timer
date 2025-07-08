@@ -28,10 +28,7 @@ export class ActiveTimerSessionModel {
   static async updateActiveSession(userId: string, updates: Partial<InsertActiveTimerSession>): Promise<ActiveTimerSession | undefined> {
     const results = await db
       .update(activeTimerSessions)
-      .set({
-        ...updates,
-        updatedAt: new Date(),
-      })
+      .set(updates)
       .where(eq(activeTimerSessions.userId, userId))
       .returning();
     
