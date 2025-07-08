@@ -45,18 +45,8 @@ export class ActiveTimerSessionModel {
   }
 
   static async getElapsedTime(session: ActiveTimerSession): Promise<number> {
-    if (!session.isRunning) {
-      return session.timeElapsed;
-    }
-
-    const now = new Date();
-    const timeSinceStart = Math.floor((now.getTime() - session.startTime.getTime()) / 1000);
-    
-    // If the session was paused, we only count the elapsed time up to when it was paused
-    if (session.isPaused) {
-      return session.timeElapsed;
-    }
-    
-    return session.timeElapsed + timeSinceStart;
+    // Since the frontend continuously updates timeElapsed every second,
+    // we can simply return the stored value to avoid double-counting
+    return session.timeElapsed;
   }
 }

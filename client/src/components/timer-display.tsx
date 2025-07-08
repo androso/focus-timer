@@ -132,13 +132,11 @@ export default function TimerDisplay() {
   // Sync local timer state with active session from server
   useEffect(() => {
     if (activeSession && !isActiveSessionLoading) {
-      const currentTime = Math.floor((new Date().getTime() - new Date(activeSession.startTime).getTime()) / 1000);
-      
       setTimerState(prev => ({
         ...prev,
         isRunning: activeSession.isRunning,
         isPaused: activeSession.isPaused,
-        timeElapsed: activeSession.isPaused ? activeSession.timeElapsed : currentTime,
+        timeElapsed: activeSession.timeElapsed,
         sessionCount: activeSession.sessionCount || 1,
         startTime: new Date(activeSession.startTime),
       }));
@@ -166,14 +164,11 @@ export default function TimerDisplay() {
 
       // Auto-save every 30 seconds to prevent data loss
       saveIntervalRef.current = setInterval(() => {
-        if (timerState.startTime) {
-          const currentElapsed = Math.floor((new Date().getTime() - timerState.startTime.getTime()) / 1000);
-          updateActiveSessionMutation.mutate({
-            timeElapsed: currentElapsed,
-            isRunning: true,
-            isPaused: false,
-          });
-        }
+        updateActiveSessionMutation.mutate({
+          timeElapsed: timerState.timeElapsed,
+          isRunning: true,
+          isPaused: false,
+        });
       }, 30000);
     } else {
       if (intervalRef.current) {
@@ -199,12 +194,10 @@ export default function TimerDisplay() {
   // Save timer state before page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (activeSession && timerState.isRunning && timerState.startTime) {
-        const currentElapsed = Math.floor((new Date().getTime() - timerState.startTime.getTime()) / 1000);
-        
+      if (activeSession && timerState.isRunning) {
         // Use navigator.sendBeacon for reliable data sending during page unload
         const data = JSON.stringify({
-          timeElapsed: currentElapsed,
+          timeElapsed: timerState.timeElapsed,
           isRunning: timerState.isRunning,
           isPaused: timerState.isPaused,
         });
@@ -247,26 +240,20 @@ export default function TimerDisplay() {
       });
     } else {
       // Resume existing session
-      const currentElapsed = timerState.isPaused 
-        ? timerState.timeElapsed 
-        : Math.floor((new Date().getTime() - new Date(activeSession.startTime).getTime()) / 1000);
-      
       updateActiveSessionMutation.mutate({
         isRunning: true,
         isPaused: false,
-        timeElapsed: currentElapsed,
+        timeElapsed: timerState.timeElapsed,
       });
     }
   };
 
   const pauseTimer = () => {
-    if (activeSession && timerState.startTime) {
-      const currentElapsed = Math.floor((new Date().getTime() - timerState.startTime.getTime()) / 1000);
-      
+    if (activeSession) {
       updateActiveSessionMutation.mutate({
         isRunning: true,
         isPaused: !timerState.isPaused,
-        timeElapsed: currentElapsed,
+        timeElapsed: timerState.timeElapsed,
       });
     }
   };
