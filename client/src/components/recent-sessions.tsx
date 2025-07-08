@@ -26,7 +26,8 @@ export default function RecentSessions() {
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
-    return `${minutes}:00`;
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
   const formatSessionTime = (date: Date) => {
@@ -119,7 +120,10 @@ export default function RecentSessions() {
                   {formatSessionTime(session.startTime)}
                 </span>
                 <div className="mt-1">
-                  <Badge variant={session.completed ? "default" : "secondary"} className="text-xs glass-effect">
+                  <Badge 
+                    variant={session.completed ? "default" : "secondary"} 
+                    className={`text-xs glass-effect ${session.completed ? "bg-green-600/80 hover:bg-green-600/60 text-white" : ""}`}
+                  >
                     {session.completed ? "Completed" : "Interrupted"}
                   </Badge>
                 </div>
