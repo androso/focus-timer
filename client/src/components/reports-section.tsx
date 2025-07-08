@@ -14,7 +14,7 @@ export default function ReportsSection() {
   const [activeTab, setActiveTab] = useState<'daily' | 'weekly' | 'monthly'>('daily');
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -22,14 +22,16 @@ export default function ReportsSection() {
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
     queryKey: ['/api/work-sessions/date', selectedDate, userTimezone],
     queryFn: async () => {
-      const response = await fetch(`/api/work-sessions/date?date=${selectedDate}&timezone=${encodeURIComponent(userTimezone)}`);
+      const response = await fetch(`/api/work-sessions/date?date=${selectedDate}&timezone=${encodeURIComponent(userTimezone)}`, {
+        credentials: 'include'
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch sessions');
       }
       return response.json();
     },
     retry: false,
-    enabled: !!user, // Only fetch when user is loaded
+    enabled: isAuthenticated && !!user, // Only fetch when authenticated and user is loaded
   });
 
   const deleteSessionMutation = useMutation({

@@ -2,12 +2,26 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { History, Play } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import type { WorkSession } from "@shared/schema";
 
 export default function RecentSessions() {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
-    queryKey: ['/api/work-sessions'],
+    queryKey: ['/api/work-sessions', userTimezone],
+    queryFn: async () => {
+      const response = await fetch(`/api/work-sessions?timezone=${encodeURIComponent(userTimezone)}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch sessions');
+      }
+      return response.json();
+    },
     retry: false,
+    enabled: isAuthenticated && !!user, // Only fetch when authenticated and user is loaded
   });
 
   const formatTime = (seconds: number) => {
@@ -16,11 +30,31 @@ export default function RecentSessions() {
   };
 
   const formatSessionTime = (date: Date) => {
-    return new Date(date).toLocaleTimeString('en-US', {
+    const sessionDate = new Date(date);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    
+    // Check if it's today or yesterday
+    const isToday = sessionDate.toDateString() === today.toDateString();
+    const isYesterday = sessionDate.toDateString() === yesterday.toDateString();
+    
+    const timeStr = sessionDate.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
     });
+    
+    if (isToday) {
+      return `Today ${timeStr}`;
+    } else if (isYesterday) {
+      return `Yesterday ${timeStr}`;
+    } else {
+      return sessionDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      }) + ` ${timeStr}`;
+    }
   };
 
   if (isLoading) {

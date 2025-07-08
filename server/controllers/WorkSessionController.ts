@@ -22,7 +22,8 @@ export class WorkSessionController {
   static async getWorkSessions(req: any, res: Response) {
     try {
       const userId = req.user.claims.sub;
-      const sessions = await WorkSessionModel.getWorkSessionsByUser(userId);
+      const { timezone } = req.query;
+      const sessions = await WorkSessionModel.getWorkSessionsByUser(userId, timezone as string);
       res.json(sessions);
     } catch (error) {
       console.error("Error fetching work sessions:", error);

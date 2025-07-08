@@ -17,11 +17,33 @@ export class WorkSessionModel {
     return workSession;
   }
 
-  static async getWorkSessionsByUser(userId: string): Promise<WorkSession[]> {
+  static async getWorkSessionsByUser(userId: string, timezone: string = "UTC"): Promise<WorkSession[]> {
+    // Get sessions from the last 7 days in the user's timezone to show truly "recent" sessions
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+    
+    // Convert to timezone-aware date strings
+    const sevenDaysAgoStr = formatInTimeZone(sevenDaysAgo, timezone, 'yyyy-MM-dd');
+    const nowStr = formatInTimeZone(now, timezone, 'yyyy-MM-dd');
+    
+    // Create start and end boundaries in the user's timezone
+    const startOfRangeString = `${sevenDaysAgoStr} 00:00:00`;
+    const endOfRangeString = `${nowStr} 23:59:59`;
+    
+    // Convert to UTC for database query
+    const startOfRangeUTC = fromZonedTime(new Date(startOfRangeString), timezone);
+    const endOfRangeUTC = fromZonedTime(new Date(endOfRangeString), timezone);
+
     return await db
       .select()
       .from(workSessions)
-      .where(eq(workSessions.userId, userId))
+      .where(
+        and(
+          eq(workSessions.userId, userId),
+          gte(workSessions.startTime, startOfRangeUTC),
+          lte(workSessions.startTime, endOfRangeUTC)
+        )
+      )
       .orderBy(desc(workSessions.startTime))
       .limit(10);
   }
