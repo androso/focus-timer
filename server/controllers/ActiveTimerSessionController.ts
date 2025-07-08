@@ -75,16 +75,12 @@ export class ActiveTimerSessionController {
       
       // Only save if there's meaningful time elapsed (more than 0 seconds)
       if (finalElapsedTime > 0) {
-        const endTime = new Date();
-        
         // Create a completed work session
         await WorkSessionModel.createWorkSession({
           userId,
           sessionType: activeSession.sessionType,
-          plannedDuration: finalElapsedTime,
           actualDuration: finalElapsedTime,
           startTime: activeSession.startTime,
-          endTime,
           completed: true,
         });
       }

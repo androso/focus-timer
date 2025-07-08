@@ -42,12 +42,9 @@ export const workSessions = pgTable("work_sessions", {
   id: serial("id").primaryKey(),
   userId: varchar("user_id").notNull().references(() => users.id),
   sessionType: varchar("session_type").notNull(), // 'work' or 'break'
-  plannedDuration: integer("planned_duration").notNull(), // in seconds
   actualDuration: integer("actual_duration").notNull(), // in seconds
   startTime: timestamp("start_time").notNull(),
-  endTime: timestamp("end_time").notNull(),
   completed: boolean("completed").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Timer settings table
@@ -72,8 +69,6 @@ export const activeTimerSessions = pgTable("active_timer_sessions", {
   isRunning: boolean("is_running").notNull().default(true),
   isPaused: boolean("is_paused").notNull().default(false),
   sessionCount: integer("session_count").default(1),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Schema types
@@ -82,10 +77,8 @@ export type User = typeof users.$inferSelect;
 
 export const insertWorkSessionSchema = createInsertSchema(workSessions).omit({
   id: true,
-  createdAt: true,
 }).extend({
   startTime: z.string().or(z.date()).transform((val) => new Date(val)),
-  endTime: z.string().or(z.date()).transform((val) => new Date(val)),
 });
 
 export const insertTimerSettingsSchema = createInsertSchema(timerSettings).omit({
@@ -96,8 +89,6 @@ export const insertTimerSettingsSchema = createInsertSchema(timerSettings).omit(
 
 export const insertActiveTimerSessionSchema = createInsertSchema(activeTimerSessions).omit({
   id: true,
-  createdAt: true,
-  updatedAt: true,
 }).extend({
   startTime: z.string().or(z.date()).transform((val) => new Date(val)),
 });

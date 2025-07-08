@@ -98,8 +98,8 @@ export class WorkSessionModel {
 
     const completedSessions = sessions.filter(s => s.completed).length;
     const totalTime = sessions.reduce((sum, s) => sum + s.actualDuration, 0);
-    const plannedTime = sessions.reduce((sum, s) => sum + s.plannedDuration, 0);
-    const efficiency = plannedTime > 0 ? Math.round((totalTime / plannedTime) * 100) : 0;
+    // For stopwatch mode, efficiency is based on session completion rate
+    const efficiency = sessions.length > 0 ? Math.round((completedSessions / sessions.length) * 100) : 0;
 
     return {
       completedSessions,

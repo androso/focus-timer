@@ -131,6 +131,14 @@ Changelog:
   - Added API endpoint for updating user timezone preferences
   - Frontend components now use stored user timezone instead of browser detection
   - Ensures daily progress resets at midnight in user's local timezone, not UTC
+- July 08, 2025. Database schema simplification for stopwatch functionality:
+  - Removed unnecessary date/time columns: `end_time`, `created_at` from work_sessions table
+  - Removed countdown-specific columns: `planned_duration` from work_sessions table  
+  - Simplified to stopwatch-only columns: `start_time` and `actual_duration`
+  - Removed `created_at` and `updated_at` from active_timer_sessions table
+  - Updated efficiency calculation to be based on session completion rate instead of time planned vs actual
+  - Updated all backend code to work with simplified schema
+  - Cleaned up validation schemas to match new simplified structure
 
 ## User Preferences
 
