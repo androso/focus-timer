@@ -57,7 +57,14 @@ export default function TimerDisplay() {
   const { data: activeSession, isLoading: isActiveSessionLoading } = useQuery<ActiveTimerSession & { currentElapsedTime: number }>({
     queryKey: ['/api/active-timer-session'],
     retry: false,
-    refetchInterval: 30000, // Refetch every 30 seconds to sync with server
+    refetchInterval: (data) => {
+      // If there's an active running session, refetch more frequently
+      if (data?.isRunning && !data?.isPaused) {
+        return 5000; // Every 5 seconds for running sessions
+      }
+      return 30000; // Every 30 seconds for paused or stopped sessions
+    },
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
   });
 
   // Create active timer session mutation
@@ -134,11 +141,22 @@ export default function TimerDisplay() {
   // Sync local timer state with active session from server
   useEffect(() => {
     if (activeSession && !isActiveSessionLoading) {
+      // Calculate real-time elapsed time for running sessions
+      let currentElapsedTime = activeSession.timeElapsed;
+      
+      if (activeSession.isRunning && !activeSession.isPaused) {
+        // Calculate additional time elapsed since last server update
+        const serverStartTime = new Date(activeSession.startTime).getTime();
+        const now = Date.now();
+        const totalElapsedMs = now - serverStartTime;
+        currentElapsedTime = Math.floor(totalElapsedMs / 1000);
+      }
+      
       setTimerState(prev => ({
         ...prev,
         isRunning: activeSession.isRunning,
         isPaused: activeSession.isPaused,
-        timeElapsed: activeSession.timeElapsed,
+        timeElapsed: currentElapsedTime,
         sessionCount: activeSession.sessionCount || 1,
         startTime: new Date(activeSession.startTime),
       }));
@@ -164,14 +182,18 @@ export default function TimerDisplay() {
         }));
       }, 1000);
 
-      // Auto-save every 30 seconds to prevent data loss
+      // Auto-save every 10 seconds to prevent data loss
       saveIntervalRef.current = setInterval(() => {
-        updateActiveSessionMutation.mutate({
-          timeElapsed: timerState.timeElapsed,
-          isRunning: true,
-          isPaused: false,
+        // Use current state value to ensure we're sending the most recent elapsed time
+        setTimerState(currentState => {
+          updateActiveSessionMutation.mutate({
+            timeElapsed: currentState.timeElapsed,
+            isRunning: currentState.isRunning,
+            isPaused: currentState.isPaused,
+          });
+          return currentState;
         });
-      }, 30000);
+      }, 10000);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -196,15 +218,33 @@ export default function TimerDisplay() {
   // Save timer state before page unload
   useEffect(() => {
     const handleBeforeUnload = () => {
-      if (activeSession && timerState.isRunning) {
-        // Use navigator.sendBeacon for reliable data sending during page unload
-        const data = JSON.stringify({
-          timeElapsed: timerState.timeElapsed,
-          isRunning: timerState.isRunning,
-          isPaused: timerState.isPaused,
+      if (activeSession) {
+        // Get the most current state
+        setTimerState(currentState => {
+          if (currentState.isRunning || currentState.isPaused) {
+            // Use navigator.sendBeacon for reliable data sending during page unload
+            const headers = {
+              'Content-Type': 'application/json',
+            };
+            const data = JSON.stringify({
+              timeElapsed: currentState.timeElapsed,
+              isRunning: currentState.isRunning,
+              isPaused: currentState.isPaused,
+            });
+            
+            // Try sendBeacon first, fallback to fetch
+            if (!navigator.sendBeacon('/api/active-timer-session', new Blob([data], { type: 'application/json' }))) {
+              // Fallback to synchronous fetch if sendBeacon fails
+              fetch('/api/active-timer-session', {
+                method: 'PATCH',
+                headers,
+                body: data,
+                keepalive: true,
+              }).catch(console.error);
+            }
+          }
+          return currentState;
         });
-        
-        navigator.sendBeacon('/api/active-timer-session', data);
       }
     };
 
@@ -212,7 +252,7 @@ export default function TimerDisplay() {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [activeSession, timerState.isRunning, timerState.isPaused, timerState.startTime]);
+  }, [activeSession]);
 
   // Update document title with timer
   useEffect(() => {
