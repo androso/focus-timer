@@ -141,13 +141,22 @@ export default function TimerDisplay() {
   // Sync local timer state with active session from server
   useEffect(() => {
     if (activeSession && !isActiveSessionLoading) {
-      // For paused or stopped sessions, use the stored timeElapsed from server
-      // For running sessions, we'll let the local timer interval handle the counting
+      // Calculate real-time elapsed time for running sessions
+      let currentElapsedTime = activeSession.timeElapsed;
+      
+      if (activeSession.isRunning && !activeSession.isPaused) {
+        // Calculate additional time elapsed since last server update
+        const serverStartTime = new Date(activeSession.startTime).getTime();
+        const now = Date.now();
+        const totalElapsedMs = now - serverStartTime;
+        currentElapsedTime = Math.floor(totalElapsedMs / 1000);
+      }
+      
       setTimerState(prev => ({
         ...prev,
         isRunning: activeSession.isRunning,
         isPaused: activeSession.isPaused,
-        timeElapsed: activeSession.timeElapsed,
+        timeElapsed: currentElapsedTime,
         sessionCount: activeSession.sessionCount || 1,
         startTime: new Date(activeSession.startTime),
       }));
@@ -204,7 +213,7 @@ export default function TimerDisplay() {
         clearInterval(saveIntervalRef.current);
       }
     };
-  }, [timerState.isRunning, timerState.isPaused, activeSession]);
+  }, [timerState.isRunning, timerState.isPaused, timerState.startTime, activeSession]);
 
   // Save timer state before page unload
   useEffect(() => {
