@@ -143,7 +143,7 @@ export default function TimerDisplay() {
     if (activeSession && !isActiveSessionLoading) {
       // Calculate real-time elapsed time for running sessions
       let currentElapsedTime = activeSession.timeElapsed;
-      
+
       if (activeSession.isRunning && !activeSession.isPaused) {
         // Calculate additional time elapsed since last server update
         const serverStartTime = new Date(activeSession.startTime).getTime();
@@ -151,7 +151,7 @@ export default function TimerDisplay() {
         const totalElapsedMs = now - serverStartTime;
         currentElapsedTime = Math.floor(totalElapsedMs / 1000);
       }
-      
+
       setTimerState(prev => ({
         ...prev,
         isRunning: activeSession.isRunning,
@@ -231,7 +231,7 @@ export default function TimerDisplay() {
               isRunning: currentState.isRunning,
               isPaused: currentState.isPaused,
             });
-            
+
             // Try sendBeacon first, fallback to fetch
             if (!navigator.sendBeacon('/api/active-timer-session', new Blob([data], { type: 'application/json' }))) {
               // Fallback to synchronous fetch if sendBeacon fails
@@ -308,7 +308,7 @@ export default function TimerDisplay() {
         isRunning: false,
         isPaused: false,
       });
-      
+
       // Stop and save the active session with current elapsed time
       stopAndSaveSessionMutation.mutate(timerState.timeElapsed);
     }
@@ -338,7 +338,7 @@ export default function TimerDisplay() {
             <BarChart3 className="w-5 h-5 text-secondary-foreground transition-transform duration-200 group-hover:scale-110" />
           </Button>
         </Link>
-        
+
         <Button 
           onClick={() => window.location.href = '/api/logout'}
           className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 hover:scale-110 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-secondary/25 group"
@@ -356,7 +356,7 @@ export default function TimerDisplay() {
             <BarChart3 className="w-4 h-4 text-secondary-foreground" />
           </Button>
         </Link>
-        
+
         <Button 
           onClick={() => window.location.href = '/api/logout'}
           className="w-10 h-10 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
@@ -388,12 +388,12 @@ export default function TimerDisplay() {
           </Button>
         ) : (
           <>
-            <Button 
+            {/* <Button 
               onClick={pauseTimer}
               className="w-16 h-16 md:w-16 md:h-16 rounded-full bg-secondary hover:bg-secondary/80 hover:scale-105 text-secondary-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-secondary/25 group mobile-control-button"
             >
               {timerState.isPaused ? <Play className="w-6 h-6 md:w-6 md:h-6 ml-1 transition-transform duration-200 group-hover:scale-110" /> : <Pause className="w-6 h-6 md:w-6 md:h-6 transition-transform duration-200 group-hover:scale-110" />}
-            </Button>
+            </Button> */}
             <Button 
               onClick={stopTimer}
               className="w-16 h-16 md:w-16 md:h-16 rounded-full bg-destructive hover:bg-destructive/80 hover:scale-105 text-destructive-foreground backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-destructive/25 group mobile-control-button"
