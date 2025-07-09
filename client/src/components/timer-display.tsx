@@ -173,7 +173,7 @@ export default function TimerDisplay() {
         }));
       }, 1000);
 
-      // Auto-save every 10 seconds to prevent data loss
+      // Auto-save every 3 seconds to prevent data loss
       saveIntervalRef.current = setInterval(() => {
         // Use current state value to ensure we're sending the most recent elapsed time
         setTimerState(currentState => {
@@ -184,7 +184,7 @@ export default function TimerDisplay() {
           });
           return currentState;
         });
-      }, 10000);
+      }, 3000);
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -272,7 +272,7 @@ export default function TimerDisplay() {
         sessionCount: 1,
       });
     } else {
-      // Resume existing session
+      // Resume existing session - ensure current elapsed time is saved to server
       updateActiveSessionMutation.mutate({
         isRunning: true,
         isPaused: false,
@@ -283,6 +283,7 @@ export default function TimerDisplay() {
 
   const pauseTimer = () => {
     if (activeSession) {
+      // Always save current elapsed time when pausing/resuming
       updateActiveSessionMutation.mutate({
         isRunning: true,
         isPaused: !timerState.isPaused,
