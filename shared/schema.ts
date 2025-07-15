@@ -34,12 +34,12 @@ export const users = sqliteTable("users", {
 
 // Work sessions table
 export const workSessions = sqliteTable("work_sessions", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id),
-  sessionType: varchar("session_type").notNull(), // 'work' or 'break'
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull().references(() => users.id),
+  sessionType: text("session_type").notNull(), // 'work' or 'break'
   actualDuration: integer("actual_duration").notNull(), // in seconds
-  startTime: timestamp("start_time").notNull(),
-  completed: boolean("completed").default(true),
+  startTime: integer("start_time", { mode: "timestamp" }).notNull(),
+  completed: integer("completed", {mode: "boolean"}).default(true),
 });
 
 // Timer settings table
