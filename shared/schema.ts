@@ -43,15 +43,15 @@ export const workSessions = sqliteTable("work_sessions", {
 });
 
 // Timer settings table
-export const timerSettings = pgTable("timer_settings", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id).unique(),
+export const timerSettings = sqliteTable("timer_settings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull().references(() => users.id).unique(),
   workDuration: integer("work_duration").default(25), // in minutes
   shortBreakDuration: integer("short_break_duration").default(5), // in minutes
   longBreakDuration: integer("long_break_duration").default(15), // in minutes
-  soundNotifications: boolean("sound_notifications").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  soundNotifications: integer("sound_notifications", { mode: "boolean" }).default(true),
+  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
 });
 
 // Active timer sessions table
