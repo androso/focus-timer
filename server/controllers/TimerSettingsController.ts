@@ -5,7 +5,7 @@ import { insertTimerSettingsSchema } from '@shared/schema';
 export class TimerSettingsController {
   static async getTimerSettings(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const settings = await TimerSettingsModel.getTimerSettings(userId);
       res.json(settings);
     } catch (error) {
@@ -16,7 +16,7 @@ export class TimerSettingsController {
 
   static async upsertTimerSettings(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const settingsData = insertTimerSettingsSchema.parse({
         ...req.body,
         userId,

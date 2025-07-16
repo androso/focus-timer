@@ -5,7 +5,7 @@ import { insertWorkSessionSchema } from '@shared/schema';
 export class WorkSessionController {
   static async createWorkSession(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const sessionData = insertWorkSessionSchema.parse({
         ...req.body,
         userId,
@@ -21,7 +21,7 @@ export class WorkSessionController {
 
   static async getWorkSessions(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { timezone } = req.query;
       const sessions = await WorkSessionModel.getWorkSessionsByUser(userId, timezone as string);
       res.json(sessions);
@@ -33,7 +33,7 @@ export class WorkSessionController {
 
   static async getWorkSessionsByDate(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { date, timezone } = req.query;
 
       if (!date || typeof date !== 'string') {
@@ -55,7 +55,7 @@ export class WorkSessionController {
 
   static async getWorkSessionsByDateRange(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { startDate, endDate } = req.query;
 
       if (!startDate || !endDate || typeof startDate !== 'string' || typeof endDate !== 'string') {
@@ -74,7 +74,7 @@ export class WorkSessionController {
 
   static async getTodayStats(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { timezone } = req.query;
       const stats = await WorkSessionModel.getTodayStats(userId, timezone as string);
       res.json(stats);
@@ -86,7 +86,7 @@ export class WorkSessionController {
 
   static async getWeeklyStats(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { timezone } = req.query;
       const stats = await WorkSessionModel.getWeeklyStats(userId, timezone as string);
       res.json(stats);
@@ -98,7 +98,7 @@ export class WorkSessionController {
 
   static async deleteWorkSession(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const sessionId = parseInt(req.params.id);
 
       if (isNaN(sessionId)) {

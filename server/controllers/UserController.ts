@@ -5,7 +5,7 @@ import { type UpsertUser } from '@shared/schema';
 export class UserController {
   static async getCurrentUser(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await UserModel.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -42,7 +42,7 @@ export class UserController {
 
   static async updateUserTimezone(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { timezone } = req.body;
       
       // Validate timezone

@@ -6,7 +6,7 @@ import { insertActiveTimerSessionSchema } from '@shared/schema';
 export class ActiveTimerSessionController {
   static async getActiveSession(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const activeSession = await ActiveTimerSessionModel.getActiveSession(userId);
       
       if (!activeSession) {
@@ -28,7 +28,7 @@ export class ActiveTimerSessionController {
 
   static async createActiveSession(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const sessionData = insertActiveTimerSessionSchema.parse({
         ...req.body,
         userId,
@@ -45,7 +45,7 @@ export class ActiveTimerSessionController {
 
   static async updateActiveSession(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const updates = req.body;
       
       const updatedSession = await ActiveTimerSessionModel.updateActiveSession(userId, updates);
@@ -63,7 +63,7 @@ export class ActiveTimerSessionController {
 
   static async stopAndSaveSession(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const { finalElapsedTime } = req.body;
       const activeSession = await ActiveTimerSessionModel.getActiveSession(userId);
       
@@ -101,7 +101,7 @@ export class ActiveTimerSessionController {
 
   static async removeActiveSession(req: any, res: Response) {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       await ActiveTimerSessionModel.removeActiveSession(userId);
       res.json({ message: "Active session removed" });
     } catch (error) {
