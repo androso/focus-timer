@@ -55,14 +55,14 @@ export const timerSettings = sqliteTable("timer_settings", {
 });
 
 // Active timer sessions table
-export const activeTimerSessions = pgTable("active_timer_sessions", {
-  id: serial("id").primaryKey(),
-  userId: varchar("user_id").notNull().references(() => users.id).unique(),
-  sessionType: varchar("session_type").notNull(), // 'work' or 'break'
-  startTime: timestamp("start_time").notNull(),
+export const activeTimerSessions = sqliteTable("active_timer_sessions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull().references(() => users.id).unique(),
+  sessionType: text("session_type").notNull(), // 'work' or 'break'
+  startTime: integer("start_time", { mode: "timestamp" }).notNull(),
   timeElapsed: integer("time_elapsed").notNull().default(0), // in seconds
-  isRunning: boolean("is_running").notNull().default(true),
-  isPaused: boolean("is_paused").notNull().default(false),
+  isRunning: integer("is_running", { mode: "boolean" }).notNull().default(true),
+  isPaused: integer("is_paused", { mode: "boolean" }).notNull().default(false),
   sessionCount: integer("session_count").default(1),
 });
 
