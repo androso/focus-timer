@@ -28,8 +28,8 @@ export const users = sqliteTable("users", {
   lastName: text("last_name"),
   profileImageUrl: text("profile_image_url"),
   timezone: text("timezone").default("UTC"), // User's preferred timezone
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
 // Work sessions table
@@ -39,7 +39,7 @@ export const workSessions = sqliteTable("work_sessions", {
   sessionType: text("session_type").notNull(), // 'work' or 'break'
   actualDuration: integer("actual_duration").notNull(), // in seconds
   startTime: integer("start_time", { mode: "timestamp" }).notNull(),
-  completed: integer("completed", {mode: "boolean"}).default(true),
+  completed: integer("completed", { mode: "boolean" }).default(true),
 });
 
 // Timer settings table
@@ -50,8 +50,8 @@ export const timerSettings = sqliteTable("timer_settings", {
   shortBreakDuration: integer("short_break_duration").default(5), // in minutes
   longBreakDuration: integer("long_break_duration").default(15), // in minutes
   soundNotifications: integer("sound_notifications", { mode: "boolean" }).default(true),
-  createdAt: integer("created_at", { mode: "timestamp" }).default(new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).default(new Date()),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
 
 // Active timer sessions table
