@@ -17,7 +17,7 @@ if (!process.env.BASE_URL) {
   throw new Error("Environment variable BASE_URL not provided");
 }
 
-export function getSession() {
+function getSession() {
   const sessionTtl = 7 * 24 * 60 * 60 * 1000; // 1 week
   
   // Use memory store for sessions (works great with SQLite as main DB)
@@ -167,5 +167,3 @@ export async function setupAuth(app: Express) {
     });
   });
 }
-
-
