@@ -100,13 +100,42 @@ export async function setupAuth(app: Express) {
           httpOnly: true,
           secure: config.api.nodeEnv === "production",
           sameSite: "lax",
-          maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-        })
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
       }
 
       res.redirect("/");
     },
   );
+
+  app.post("/api/refresh-token", async (req, res) => {
+    if (req.cookies && req.cookies.refreshToken && req.user) {
+      const refreshToken = req.cookies.refreshToken;
+      const user = req.user as any;
+      const tokenRecord = RefreshTokenModel.validateRefreshToken(
+        refreshToken,
+        user.id,
+      );
+      
+      if (!tokenRecord) {
+        res.status(401).json({ message: "Invalid or expired refresh token" });
+      } else {
+        const newAccessToken = generateJWT(user.id, config.jwt.defaultDuration);
+
+        res.cookie("accessToken", newAccessToken, {
+          httpOnly: true,
+          secure: config.api.nodeEnv === "production",
+          sameSite: "lax",
+          maxAge: 60 * 60 * 1000,
+        });
+
+        res.json({ message: "Token refreshed successfully" });
+      }
+      
+    } else {
+      res.status(401).json({ message: "No refresh token found" });
+    }
+  });
 
   app.get("/api/logout", async (req: any, res) => {
     // Save any active timer session before logout
