@@ -1,28 +1,11 @@
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import passport from "passport";
-import session from "express-session";
-import type { Express, RequestHandler } from "express";
-import MemoryStore from "memorystore";
+import type { Express } from "express";
 import { UserController } from "../controllers/UserController";
 import { config } from "server/config";
-import { generateJWT, generateRefreshToken } from "./jwt";
+import { generateJWT } from "./jwt";
 import { RefreshTokenModel } from "server/models/RefreshTokens";
-
-interface GoogleProfile {
-  id: string;
-  displayName: string;
-  name: {
-    familyName: string;
-    givenName: string;
-  };
-  emails: Array<{
-    value: string;
-    verified: boolean;
-  }>;
-  photos: Array<{
-    value: string;
-  }>;
-}
+import { workSessions } from "@shared/schema";
 
 export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);
@@ -116,7 +99,7 @@ export async function setupAuth(app: Express) {
         refreshToken,
         user.id,
       );
-      
+
       if (!tokenRecord) {
         res.status(401).json({ message: "Invalid or expired refresh token" });
       } else {
@@ -131,31 +114,41 @@ export async function setupAuth(app: Express) {
 
         res.json({ message: "Token refreshed successfully" });
       }
-      
     } else {
       res.status(401).json({ message: "No refresh token found" });
     }
   });
 
   app.get("/api/logout", async (req: any, res) => {
-    // Save any active timer session before logout
-    if (req.user && req.user.id) {
+    const { validateJWT } = await import("./jwt");
+    const { extractAccessToken } = await import("../utils/tokenExtractors");
+
+    const accessToken = extractAccessToken(req);
+    let userId: string | undefined;
+
+    if (accessToken) {
+      try {
+        const payload = validateJWT(accessToken);
+        userId = payload?.sub;
+      } catch (e) {
+        console.log("Token validation failed during logout: ", e);
+      }
+    }
+
+    // it's time to save any active timer session before logout
+    if (userId) {
       try {
         const { ActiveTimerSessionModel } = await import(
           "../models/ActiveTimerSession"
         );
         const { WorkSessionModel } = await import("../models/WorkSession");
 
-        const userId = req.user.id;
         const activeSession =
           await ActiveTimerSessionModel.getActiveSession(userId);
 
         if (activeSession) {
-          // Calculate final elapsed time
           const finalElapsedTime =
             await ActiveTimerSessionModel.getElapsedTime(activeSession);
-
-          // Save if there's meaningful time elapsed (more than 0 seconds)
           if (finalElapsedTime > 0) {
             await WorkSessionModel.createWorkSession({
               userId,
@@ -166,26 +159,15 @@ export async function setupAuth(app: Express) {
             });
           }
 
-          // Remove the active session
           await ActiveTimerSessionModel.removeActiveSession(userId);
         }
-      } catch (error) {
-        console.error("Error saving active session on logout:", error);
-        // Continue with logout even if session saving fails
+      } catch (e) {
+        console.error("Error saving active session on logout: ", e);
       }
     }
 
-    req.logout((err: any) => {
-      if (err) {
-        console.error("Logout error:", err);
-      }
-      req.session.destroy((sessionErr: any) => {
-        if (sessionErr) {
-          console.error("Session destroy error:", sessionErr);
-        }
-        res.clearCookie("connect.sid");
-        res.redirect("/");
-      });
-    });
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.redirect("/");
   });
 }
