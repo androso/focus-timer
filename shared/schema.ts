@@ -66,6 +66,16 @@ export const activeTimerSessions = sqliteTable("active_timer_sessions", {
   sessionCount: integer("session_count").default(1),
 });
 
+// Refresh tokens table for JWT authentication
+export const refreshTokens = sqliteTable("refresh_tokens", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  token: text("token").notNull().unique(),
+  userId: text("user_id").notNull().references(() => users.id),
+  expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  isRevoked: integer("is_revoked", { mode: "boolean" }).default(false),
+});
+
 // Schema types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -88,6 +98,11 @@ export const insertActiveTimerSessionSchema = createInsertSchema(activeTimerSess
   startTime: z.string().or(z.date()).transform((val) => new Date(val)),
 });
 
+export const insertRefreshTokenSchema = createInsertSchema(refreshTokens).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertWorkSession = z.infer<typeof insertWorkSessionSchema>;
 export type WorkSession = typeof workSessions.$inferSelect;
 
@@ -96,3 +111,6 @@ export type TimerSettings = typeof timerSettings.$inferSelect;
 
 export type InsertActiveTimerSession = z.infer<typeof insertActiveTimerSessionSchema>;
 export type ActiveTimerSession = typeof activeTimerSessions.$inferSelect;
+
+export type InsertRefreshToken = z.infer<typeof insertRefreshTokenSchema>;
+export type RefreshToken = typeof refreshTokens.$inferSelect;
