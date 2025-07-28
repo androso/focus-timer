@@ -4,7 +4,15 @@ dotenv.config();
 
 type Config = {
     db: DBConfig,
-    jwt: JWTConfig
+    jwt: JWTConfig,
+    api: ApiConfig
+}
+
+type ApiConfig = {
+    googleClientId: string,
+    googleClientSecret: string,
+    baseUrl: string,
+    nodeEnv: string
 }
 
 type DBConfig = {
@@ -36,5 +44,11 @@ export const config: Config = {
         secret: getEnvOrThrow("JWT_SECRET"),
         defaultDuration: 60 * 60,
         issuer: getEnvOrThrow("JWT_ISSUER")
+    },
+    api: {
+        baseUrl: getEnvOrThrow("BASE_URL"),
+        googleClientId: getEnvOrThrow("GOOGLE_CLIENT_ID"),
+        googleClientSecret: getEnvOrThrow("GOOGLE_CLIENT_SECRET"),
+        nodeEnv: getEnvOrThrow("NODE_ENV")
     }
 }
