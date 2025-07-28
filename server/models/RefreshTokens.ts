@@ -31,4 +31,11 @@ export class RefreshTokenModel {
         
         return result 
     }
+    
+    static async revokeRefreshToken(token: string) {
+        await db
+            .update(refreshTokens)
+            .set({ isRevoked: true })
+            .where(eq(refreshTokens.token, token))
+    }
 }
