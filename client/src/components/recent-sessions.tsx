@@ -3,16 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { History, Play } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { authFetch } from "@/lib/authUtils";
 import type { WorkSession } from "@shared/schema";
 
 export default function RecentSessions() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-  
+
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
     queryKey: ['/api/work-sessions', userTimezone],
     queryFn: async () => {
-      const response = await fetch(`/api/work-sessions?timezone=${encodeURIComponent(userTimezone)}`, {
+      const response = await authFetch(`/api/work-sessions?timezone=${encodeURIComponent(userTimezone)}`, {
         credentials: 'include'
       });
       if (!response.ok) {
@@ -35,17 +36,17 @@ export default function RecentSessions() {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
-    
+
     // Check if it's today or yesterday
     const isToday = sessionDate.toDateString() === today.toDateString();
     const isYesterday = sessionDate.toDateString() === yesterday.toDateString();
-    
+
     const timeStr = sessionDate.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true
     });
-    
+
     if (isToday) {
       return `Today ${timeStr}`;
     } else if (isYesterday) {

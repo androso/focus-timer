@@ -6,7 +6,6 @@ import { config } from "server/config";
 import { generateJWT } from "./jwt";
 import { RefreshTokenModel } from "server/models/RefreshTokens";
 import { extractRefreshToken } from "../utils/tokenExtractors";
-import { refreshTokens } from "@shared/schema";
 
 export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);

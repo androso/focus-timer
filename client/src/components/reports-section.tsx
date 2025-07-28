@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Play, Check, X, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { authFetch } from "@/lib/authUtils";
 import type { WorkSession } from "@shared/schema";
 
 export default function ReportsSection() {
@@ -22,7 +23,7 @@ export default function ReportsSection() {
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
     queryKey: ['/api/work-sessions/date', selectedDate, userTimezone],
     queryFn: async () => {
-      const response = await fetch(`/api/work-sessions/date?date=${selectedDate}&timezone=${encodeURIComponent(userTimezone)}`, {
+      const response = await authFetch(`/api/work-sessions/date?date=${selectedDate}&timezone=${encodeURIComponent(userTimezone)}`, {
         credentials: 'include'
       });
       if (!response.ok) {
@@ -36,7 +37,7 @@ export default function ReportsSection() {
 
   const deleteSessionMutation = useMutation({
     mutationFn: async (sessionId: number) => {
-      const response = await fetch(`/api/work-sessions/${sessionId}`, {
+      const response = await authFetch(`/api/work-sessions/${sessionId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -73,7 +74,7 @@ export default function ReportsSection() {
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    
+
     if (hours > 0) {
       return `${hours}:${minutes.toString().padStart(2, '0')}`;
     }
@@ -141,7 +142,7 @@ export default function ReportsSection() {
             </Button>
           </div>
         </div>
-        
+
         {/* Date Picker */}
         <div className="mb-6">
           <Label htmlFor="date-picker" className="text-sm minimal-text text-white/90 mb-2 block">

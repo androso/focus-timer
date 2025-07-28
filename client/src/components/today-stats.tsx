@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Clock, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { authFetch } from "@/lib/authUtils";
 
 interface TodayStats {
   completedSessions: number;
@@ -20,7 +21,9 @@ export default function TodayStats() {
   }>({
     queryKey: ['/api/stats/today', userTimezone],
     queryFn: async () => {
-      const response = await fetch(`/api/stats/today?timezone=${encodeURIComponent(userTimezone)}`);
+      const response = await authFetch(`/api/stats/today?timezone=${encodeURIComponent(userTimezone)}`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch today stats');
       }

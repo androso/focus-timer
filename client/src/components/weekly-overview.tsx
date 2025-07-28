@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { authFetch } from "@/lib/authUtils";
 
 interface WeeklyStats {
   day: string;
@@ -18,7 +19,9 @@ export default function WeeklyOverview() {
   }[]>({
     queryKey: ['/api/stats/weekly', userTimezone],
     queryFn: async () => {
-      const response = await fetch(`/api/stats/weekly?timezone=${encodeURIComponent(userTimezone)}`);
+      const response = await authFetch(`/api/stats/weekly?timezone=${encodeURIComponent(userTimezone)}`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch weekly stats');
       }

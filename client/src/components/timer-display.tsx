@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { isUnauthorizedError } from "@/lib/authUtils";
+import { isUnauthorizedError, authFetch } from "@/lib/authUtils";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Square, BarChart3, LogOut } from "lucide-react";
 import { Link } from "wouter";
@@ -38,12 +38,14 @@ export default function TimerDisplay() {
   });
 
   // Fetch today's stats for focused time
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
   const { data: todayStats } = useQuery<{totalTime: number}>({
     queryKey: ['/api/stats/today', userTimezone],
     queryFn: async () => {
-      const response = await fetch(`/api/stats/today?timezone=${encodeURIComponent(userTimezone)}`);
+      const response = await authFetch(`/api/stats/today?timezone=${encodeURIComponent(userTimezone)}`, {
+        credentials: 'include',
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch today stats');
       }
@@ -340,7 +342,7 @@ export default function TimerDisplay() {
         </Link>
 
         <Button 
-          onClick={() => window.location.href = '/api/logout'}
+          onClick={() => logout()}
           className="w-12 h-12 rounded-full bg-secondary hover:bg-secondary/80 hover:scale-110 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center hover:shadow-lg hover:shadow-secondary/25 group"
         >
           <LogOut className="w-5 h-5 text-secondary-foreground transition-transform duration-200 group-hover:scale-110" />
@@ -358,7 +360,7 @@ export default function TimerDisplay() {
         </Link>
 
         <Button 
-          onClick={() => window.location.href = '/api/logout'}
+          onClick={() => logout()}
           className="w-10 h-10 rounded-full bg-secondary hover:bg-secondary/80 border border-border backdrop-blur-sm transition-all duration-200 flex items-center justify-center"
         >
           <LogOut className="w-4 h-4 text-secondary-foreground" />
