@@ -5,7 +5,8 @@ import { UserController } from "../controllers/UserController";
 import { config } from "server/config";
 import { generateJWT } from "./jwt";
 import { RefreshTokenModel } from "server/models/RefreshTokens";
-import { workSessions } from "@shared/schema";
+import { extractRefreshToken } from "../utils/tokenExtractors";
+import { refreshTokens } from "@shared/schema";
 
 export async function setupAuth(app: Express) {
   app.set("trust proxy", 1);
@@ -169,5 +170,22 @@ export async function setupAuth(app: Express) {
     res.clearCookie("accessToken");
     res.clearCookie("refreshToken");
     res.redirect("/");
+  });
+
+  app.post("/api/revoke-token", async (req, res) => {
+    const refreshToken = extractRefreshToken(req);
+
+    if (!refreshToken) {
+      res.status(401).json({ message: "No refresh token provided" });
+    }
+
+    try {
+      await RefreshTokenModel.revokeRefreshToken(refreshToken);
+      res.clearCookie("refreshToken");
+      res.json({ message: "Token revoked successfully" });
+    } catch (e) {
+      console.error("Token revoke error: ", e);
+      res.status(500).json({ message: "Failed to revoke token" });
+    }
   });
 }
