@@ -14,7 +14,6 @@ declare global {
 
 export const isAuthenticated: RequestHandler = async (req, res, next) => {
   const accessToken = extractAccessToken(req);
-
   if (accessToken) {
      try {
        const payload = validateJWT(accessToken);

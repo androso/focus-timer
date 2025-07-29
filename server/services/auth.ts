@@ -62,7 +62,10 @@ export async function setupAuth(app: Express) {
 
   app.get(
     "/api/callback",
-    passport.authenticate("google", { failureRedirect: "/api/login" }),
+    passport.authenticate("google", {
+      failureRedirect: "/api/login",
+      session: false
+    }),
     async (req, res) => {
       // Successful authentication, generate JWT tokens
       const user = req.user as any;
