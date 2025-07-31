@@ -163,11 +163,12 @@ export class WorkSessionModel {
     const weeklyStats = days.map(day => ({ day, totalTime: 0 }));
 
     sessions.forEach(session => {
-      // Convert session time back to user's timezone for day calculation
-      const sessionTimeStr = formatInTimeZone(session.startTime, timezone, 'yyyy-MM-dd');
-      const sessionDate = new Date(sessionTimeStr);
-      const dayIndex = sessionDate.getDay();
-      weeklyStats[dayIndex].totalTime += session.actualDuration;
+      // Get the weekday directly from the session time in user's timezone
+      const weekdayStr = formatInTimeZone(session.startTime, timezone, 'EEEE'); // Full weekday name
+      const dayIndex = days.indexOf(weekdayStr);
+      if (dayIndex >= 0) {
+        weeklyStats[dayIndex].totalTime += session.actualDuration;
+      }
     });
 
     return weeklyStats;

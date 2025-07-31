@@ -8,7 +8,10 @@ import type { WorkSession } from "@shared/schema";
 
 export default function RecentSessions() {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
-  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Use browser-detected timezone if user timezone is not set or is the default "UTC"
+  const userTimezone = (user?.timezone && user.timezone !== "UTC") 
+    ? user.timezone 
+    : Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
     queryKey: ['/api/work-sessions', userTimezone],

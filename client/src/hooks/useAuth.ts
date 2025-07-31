@@ -49,9 +49,9 @@ export function useAuth() {
     },
   });
 
-  // Auto-detect and set user timezone on first login
+  // Auto-detect and set user timezone on first login or if timezone is default "UTC"
   useEffect(() => {
-    if (user && !user.timezone) {
+    if (user && (!user.timezone || user.timezone === "UTC")) {
       const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       updateTimezoneMutation.mutate(detectedTimezone);
     }

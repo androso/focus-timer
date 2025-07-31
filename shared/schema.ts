@@ -37,7 +37,9 @@ export const workSessions = sqliteTable("work_sessions", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: text("user_id").notNull().references(() => users.id),
   sessionType: text("session_type").notNull(), // 'work' or 'break'
+  //! Storing seconds, although this makes more sense as it's not marked as timestamp
   actualDuration: integer("actual_duration").notNull(), // in seconds
+  //! this is set in the db as a unix timestamp and it's just putting seconds.
   startTime: integer("start_time", { mode: "timestamp" }).notNull(),
   completed: integer("completed", { mode: "boolean" }).default(true),
 });

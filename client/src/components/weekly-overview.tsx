@@ -11,7 +11,10 @@ interface WeeklyStats {
 
 export default function WeeklyOverview() {
   const { user } = useAuth();
-  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Use browser-detected timezone if user timezone is not set or is the default "UTC"
+  const userTimezone = (user?.timezone && user.timezone !== "UTC") 
+    ? user.timezone 
+    : Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: weeklyData, isLoading } = useQuery<{
     day: string;

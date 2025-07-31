@@ -39,7 +39,10 @@ export default function TimerDisplay() {
 
   // Fetch today's stats for focused time
   const { user, logout } = useAuth();
-  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Use browser-detected timezone if user timezone is not set or is the default "UTC"
+  const userTimezone = (user?.timezone && user.timezone !== "UTC") 
+    ? user.timezone 
+    : Intl.DateTimeFormat().resolvedOptions().timeZone;
   const { data: todayStats } = useQuery<{totalTime: number}>({
     queryKey: ['/api/stats/today', userTimezone],
     queryFn: async () => {

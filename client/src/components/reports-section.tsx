@@ -18,7 +18,10 @@ export default function ReportsSection() {
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const userTimezone = user?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  // Use browser-detected timezone if user timezone is not set or is the default "UTC"
+  const userTimezone = (user?.timezone && user.timezone !== "UTC") 
+    ? user.timezone 
+    : Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const { data: sessions, isLoading } = useQuery<WorkSession[]>({
     queryKey: ['/api/work-sessions/date', selectedDate, userTimezone],
