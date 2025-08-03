@@ -14,22 +14,6 @@ export class UserController {
     }
   }
 
-  static async getUser(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const user = await UserModel.getUser(id);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  }
-
   static async upsertUser(userData: UpsertUser) {
     try {
       const user = await UserModel.upsertUser(userData);
