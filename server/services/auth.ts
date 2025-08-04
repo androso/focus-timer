@@ -103,13 +103,23 @@ export async function setupAuth(app: Express) {
       if (!tokenRecord) {
         res.status(401).json({ message: "Invalid or expired refresh token" });
       } else {
+        await RefreshTokenModel.revokeRefreshToken(refreshToken);
+        
         const newAccessToken = generateJWT(tokenRecord.userId, config.jwt.defaultDuration);
+        const newRefreshToken = await RefreshTokenModel.storeRefreshToken(tokenRecord.userId);
 
         res.cookie("accessToken", newAccessToken, {
           httpOnly: true,
           secure: config.api.nodeEnv === "production",
           sameSite: "lax",
           maxAge: 60 * 60 * 1000,
+        });
+
+        res.cookie("refreshToken", newRefreshToken, {
+          httpOnly: true,
+          secure: config.api.nodeEnv === "production",
+          sameSite: "lax",
+          maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
 
         res.json({ message: "Token refreshed successfully" });
