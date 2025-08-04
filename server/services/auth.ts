@@ -95,18 +95,15 @@ export async function setupAuth(app: Express) {
   );
 
   app.post("/api/refresh-token", async (req, res) => {
-    if (req.cookies && req.cookies.refreshToken && req.user) {
+    if (req.cookies && req.cookies.refreshToken) {
       const refreshToken = req.cookies.refreshToken;
-      const user = req.user as any;
-      const tokenRecord = RefreshTokenModel.validateRefreshToken(
-        refreshToken,
-        user.id,
-      );
+      
+      const tokenRecord = await RefreshTokenModel.validateRefreshToken(refreshToken);
 
       if (!tokenRecord) {
         res.status(401).json({ message: "Invalid or expired refresh token" });
       } else {
-        const newAccessToken = generateJWT(user.id, config.jwt.defaultDuration);
+        const newAccessToken = generateJWT(tokenRecord.userId, config.jwt.defaultDuration);
 
         res.cookie("accessToken", newAccessToken, {
           httpOnly: true,

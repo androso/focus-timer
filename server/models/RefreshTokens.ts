@@ -16,7 +16,7 @@ export class RefreshTokenModel {
         return refreshToken
     }
 
-    static async validateRefreshToken(refreshToken: string, userId: string) {
+    static async validateRefreshToken(refreshToken: string) {
         const [result] = await db
             .select()
             .from(refreshTokens)
@@ -25,7 +25,6 @@ export class RefreshTokenModel {
                     eq(refreshTokens.token, refreshToken),
                     eq(refreshTokens.isRevoked, false),
                     gt(refreshTokens.expiresAt, new Date()),
-                    eq(refreshTokens.userId, userId) 
                 )
             ).limit(1);
         
