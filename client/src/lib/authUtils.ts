@@ -106,13 +106,17 @@ export async function logout(): Promise<void> {
  */
 export function withAuth(fetchFn: typeof fetch) {
   return async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    // Check if this request already attempted a refresh to prevent infinite loops
+    const hasRetried = init?.headers && 
+      (init.headers as Record<string, string>)['X-Auth-Retry'] === 'true';
+
     const response = await fetchFn(input, {
       ...init,
       credentials: 'include', // Always include cookies
     });
 
-    // If we get a 401 with TOKEN_EXPIRED, try to refresh and retry once
-    if (response.status === 401) {
+    // If we get a 401, try to refresh and retry once (only if we haven't already tried)
+    if (response.status === 401 && !hasRetried) {
       // Don't try to refresh on the refresh token endpoint itself to avoid infinite loops
       const url = typeof input === 'string' ? input : input.toString();
       if (url.includes('/api/refresh-token')) {
@@ -122,15 +126,28 @@ export function withAuth(fetchFn: typeof fetch) {
       try {
         // Clone the response so we can read it without consuming the original
         const responseClone = response.clone();
-        const data: AuthResponse = await responseClone.json();
+        let shouldRefresh = false;
+        
+        try {
+          const data: AuthResponse = await responseClone.json();
+          // Refresh if token is explicitly expired, invalid, or if it's a generic unauthorized (no access token)
+          shouldRefresh = data.code === 'TOKEN_EXPIRED' || data.code === 'INVALID_TOKEN' || !data.code;
+        } catch (jsonError) {
+          // If we can't parse the response, assume it's a token issue and try to refresh
+          shouldRefresh = true;
+        }
 
-        if (data.code === 'TOKEN_EXPIRED') {
+        if (shouldRefresh) {
           const refreshSuccess = await refreshAuthToken();
           if (refreshSuccess) {
-            // Retry the original request
+            // Retry the original request with a flag to prevent further retries
             return await fetchFn(input, {
               ...init,
               credentials: 'include',
+              headers: {
+                ...((init?.headers as Record<string, string>) || {}),
+                'X-Auth-Retry': 'true',
+              },
             });
           }
         }
