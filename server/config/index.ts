@@ -42,7 +42,7 @@ export const config: Config = {
     },
     jwt: {
         secret: getEnvOrThrow("JWT_SECRET"),
-        defaultDuration: 60,
+        defaultDuration: 60 * 60 * 2,
         issuer: getEnvOrThrow("JWT_ISSUER")
     },
     api: {
